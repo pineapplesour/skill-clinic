@@ -26,7 +26,7 @@ Skill Clinic parses the runnable steps out of a skill file, **executes them for 
 fresh Daytona sandbox, records per-step exit code / output / duration, classifies every failure with
 a cheap LLM judge (or deterministic rules), proposes a fix, and **re-verifies that fix in another
 fresh sandbox** before claiming anything. Output is a terminal table plus a per-step evidence report
-in Markdown and JSON.
+in Markdown, JSON and a self-contained HTML page you can open or attach straight from `reports/`.
 
 ## Pipeline
 
@@ -41,7 +41,7 @@ SKILL.md ──▶ extract ──▶ Daytona sandbox A ──▶ per-step exit c
                                                      │
                                             exit 0 ──▶ FIXED   exit != 0 ──▶ FAIL
                                                      │
-                                            report ──▶ table + reports/<skill>-<ts>.{md,json}
+                                            report ──▶ table + reports/<skill>-<ts>.{md,json,html}
 ```
 
 ## Daytona usage
@@ -50,15 +50,15 @@ Every step in a report was produced by these SDK calls — nothing is simulated:
 
 | Call | Where | Why |
 |------|-------|-----|
-| `Daytona()` | `clinic/sandbox.py:86` | client from `DAYTONA_API_KEY` / `DAYTONA_TARGET` |
-| `client.create()` | `clinic/sandbox.py:106` | fresh disposable sandbox per run (~1.5-3s warm) |
-| `sandbox.fs.upload_file(archive, "skill.tar.gz")` | `clinic/sandbox.py:134` | ship the whole skill dir (`tarfile` gzip, `clinic/sandbox.py:71`) |
-| `sandbox.process.exec("bash -lc 'tar xzf ...'", timeout=120)` | `clinic/sandbox.py:135` | unpack into `/home/daytona/skill` |
-| `sandbox.process.exec(cmd, cwd=WORKDIR, timeout=...)` | `clinic/sandbox.py:154` | run one skill step; `exit_code` is the only source of truth |
-| `sandbox.delete()` | `clinic/sandbox.py:124` | in `close()`, always reached via `__exit__` / `finally` |
+| `Daytona()` | `clinic/sandbox.py:90` | client from `DAYTONA_API_KEY` / `DAYTONA_TARGET` |
+| `client.create()` | `clinic/sandbox.py:110` | fresh disposable sandbox per run (~1.5-3s warm) |
+| `sandbox.fs.upload_file(archive, "skill.tar.gz")` | `clinic/sandbox.py:138` | ship the whole skill dir (`tarfile` gzip, `clinic/sandbox.py:75`) |
+| `sandbox.process.exec("bash -lc 'tar xzf ...'", timeout=120)` | `clinic/sandbox.py:139` | unpack into `/home/daytona/skill` |
+| `sandbox.process.exec(cmd, cwd=WORKDIR, timeout=...)` | `clinic/sandbox.py:158` | run one skill step; `exit_code` is the only source of truth |
+| `sandbox.delete()` | `clinic/sandbox.py:128` | in `close()`, always reached via `__exit__` / `finally` |
 
 Sandbox A runs all steps sequentially so state persists (installs from step 1 are visible in step 4).
-Fix re-verification always uses a **new** sandbox (`verify_fix`, `clinic/sandbox.py:195`) so a fix can
+Fix re-verification always uses a **new** sandbox (`verify_fix`, `clinic/sandbox.py:199`) so a fix can
 never be credited to leftover state.
 
 A sandbox is never leaked: if the upload into a freshly created sandbox fails, `__enter__` calls
@@ -148,12 +148,17 @@ which one judged it (`judge: nosana:<model>` vs `judge: rules`).
 - **The exit code decides pass/fail. Always. In code.** (`clinic/report.py:decide_verdict`,
   `clinic/sandbox.py:StepResult.ok`)
 - The model only *labels* an already-failed step with one of:
-  `stale_package`, `stale_command`, `missing_secret`, `env_specific`, `network_blocked`, `bug`, `unknown`.
+  `stale_package`, `stale_command`, `missing_tool`, `example_snippet`, `missing_secret`, `env_specific`,
+  `network_blocked`, `bug`, `unknown`.
 - A proposed fix is only ever reported as `FIXED` after it exits 0 in a fresh sandbox.
 - `missing_secret` never gets a `fix_command` — we do not invent credentials.
 - Before any error-message heuristic, the **command text itself** is prechecked for host-specific
   commands (`powershell`, `*.exe`, `/mnt/c/...`, `C:\...`, `wsl`, `brew`, `sudo`, `systemctl`,
   `osascript`) and classified `env_specific` (`clinic/judge.py:_ENV_CMD`).
+- The sudo asymmetry is deliberate: a skill that *requires* `sudo` is flagged `env_specific` because it
+  assumes privileges on the reader's machine, while the clinic's own `missing_tool` fix uses `sudo` only
+  inside the throwaway sandbox where it is harmless — and that fix is reported as a proposal, never
+  applied to your machine.
 
 ### Known rot rules
 
@@ -203,7 +208,7 @@ fixtures do.
 
 ## Evidence: Nosana-judged run
 
-GPU jobs provisioned today with `nosana_deploy.py` (credit-paid, via `POST /jobs/list`; all three left in the
+GPU jobs provisioned today with `nosana_deploy.py` (credit-paid, via `POST /jobs/list`; all four left in the
 account's job history so a judge can verify them):
 
 | Job address | Market | Template | Credits reserved | Posted (KST) |
@@ -215,7 +220,7 @@ account's job history so a judge can verify them):
 
 Endpoints: `https://<job>.node.k8s.prd.nos.ci` (Ollama; OpenAI-compatible under `/v1`). Explorer: `https://explore.nosana.com/jobs/<job>`.
 
-Honest status at the time of writing: the nodes accepted all three jobs within seconds (state RUNNING, node assigned) but
+Honest status at the time of writing: the nodes accepted all four jobs within seconds (state RUNNING, node assigned) but
 were still pulling the model image ("Service Initializing", HTTP 503) for 20+ minutes. The recorded run below is appended
 the moment an endpoint answers; if this section still ends here, the LLM judge was never reached and every report in
 `reports/` says so explicitly (`judge: rules`). We do not fake it.

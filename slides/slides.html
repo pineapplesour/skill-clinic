@@ -109,7 +109,7 @@ table.data code { font-size:15px; background:none; padding:0; color:var(--ink); 
       <span class="t"><b>Daytona</b> 새 샌드박스: 업로드 <span class="arrow">→</span> 순차 실행 <span class="arrow">→</span> exit code · 로그</span></div>
     <div class="step"><span class="n">3</span>
       <span class="t">실패만 <b>Nosana</b> GPU의 Qwen3.5-9B(Ollama)가 분류
-      <span class="s">stale_package · stale_command · missing_secret · env_specific · network_blocked · bug</span></span></div>
+      <span class="s">stale_package · stale_command · missing_tool · example_snippet · missing_secret · env_specific · network_blocked · bug</span></span></div>
     <div class="step"><span class="n">4</span>
       <span class="t">수정안 <span class="arrow">→</span> <b>Daytona</b> 또 다른 새 샌드박스에서 재실행 <span class="arrow">→</span> FIXED / FAIL</span></div>
     <div class="step"><span class="n">5</span>
@@ -140,6 +140,7 @@ table.data code { font-size:15px; background:none; padding:0; color:var(--ink); 
     <tr><td class="skillname">anthropics/skills · pdf<br><span style="font-weight:400;font-size:12px;color:#666">제3자, 무수정</span></td><td><code>pdftotext</code> <code>qpdf</code> <code>pdftk</code> <code>pdfimages</code></td><td><span class="pill p-fail">BROKEN</span></td><td>missing_tool ×4</td><td>apt 자동 설치 후 재실행 → 예시 파일(input.pdf) 부재</td></tr>
   </table>
   <p class="note">덤으로 잡은 것: 샌드박스 기본 이미지의 <code>daytona</code> 바이너리는 CLI가 아니라 툴박스 데몬이라 옛 명령 <code>daytona sandbox create</code>가 <b>조용히 exit 0</b>. 이런 게 스킬 부패다.</p>
+  <p class="note">Nosana 판정 런은 GPU 잡 4개가 모두 모델 풀링 중(503)이라 이 시점까지는 rules 판정만 기록됨. README 증거 섹션에 잡 주소 공개.</p>
   <p class="note"><b>다음</b>: 배포판×런타임 매트릭스(스냅샷 팬아웃) · 자동 PR · skills 레지스트리용 검진 배지</p>
   <div class="foot"><table><tr>
     <td>Team: pineapplesour</td>

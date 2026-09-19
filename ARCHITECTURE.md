@@ -13,9 +13,15 @@
 3. `clinic/judge.py` — failure classification only. LLM path posts a strict-JSON prompt to the
    Nosana-hosted OpenAI-compatible endpoint and parses first `{` … last `}`; any error falls back to
    an ordered regex table. Returns `{category, explanation, fix_command|null, confidence, judge}`.
+   Categories include `missing_tool` (a binary a fresh machine lacks -> propose the apt install) and
+   `example_snippet` (the step references example inputs the skill never creates -> no fix). A proposed
+   fix that still fails is re-classified from its new output into the step's `after_fix` field. A step
+   whose sandbox call itself raised is `INFRA_ERROR`: never judged, never counted against the skill.
 4. `clinic/report.py` — `decide_verdict()` (pure exit-code logic) plus a rich table and the
    `reports/<skill>-<timestamp>.{md,json}` evidence files with per-step output tails.
-5. `clinic/cli.py` + `clinic.py` — three visible phases: run in sandbox A → diagnose failures →
+5. `clinic/html_report.py` — `write_html()` renders the same JSON payload as one self-contained
+   `reports/<skill>-<timestamp>.html` (no external CSS/JS) for mailing or attaching to an issue.
+6. `clinic/cli.py` + `clinic.py` — three visible phases: run in sandbox A → diagnose failures →
    re-verify fixes in fresh sandbox B, printing sandbox ids and step numbers live for the stage demo.
 
 Design rule threaded through all of it: **the model never decides pass/fail** — it only names a
