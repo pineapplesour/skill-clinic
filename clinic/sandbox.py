@@ -194,15 +194,18 @@ def run_steps(skill_dir: str, steps, timeout: int = 180, log=print,
 
 def verify_fix(skill_dir: str, prior_commands: list[str], fix_command: str,
                timeout: int = 180, log=print) -> tuple[int, str, float]:
-    """Replay previously-passing steps + the fix in a FRESH sandbox."""
+    """Replay previously-passing steps + the fix in a FRESH sandbox.
+
+    Raises:
+        SandboxInfraError: the sandbox/SDK itself failed. The caller must report the
+            fix as *unverified infrastructure*, never as a failed fix - an exit code
+            we made up here would be indistinguishable from the fix not working.
+    """
     with SkillSandbox(skill_dir, log=log) as sb:
-        try:
-            for cmd in prior_commands:
-                sb.run(cmd, timeout=timeout)
-            log(f"      [fix] {fix_command[:70]}")
-            return sb.run(fix_command, timeout=timeout)
-        except SandboxInfraError as err:
-            return INFRA_EXIT_CODE, str(err), err.seconds
+        for cmd in prior_commands:
+            sb.run(cmd, timeout=timeout)
+        log(f"      [fix] {fix_command[:70]}")
+        return sb.run(fix_command, timeout=timeout)
 
 
 def fresh(skill_dir: str, log=print) -> SkillSandbox:

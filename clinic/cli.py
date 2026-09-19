@@ -14,7 +14,7 @@ from collections import Counter
 from .extract import load_skill
 from .judge import classify
 from .report import INFRA_STATUS, count_infra_errors, decide_verdict, render_table, write_reports
-from .sandbox import ClinicConfigError, run_steps, verify_fix
+from .sandbox import ClinicConfigError, SandboxInfraError, run_steps, verify_fix
 
 console = Console(width=max(shutil.get_terminal_size((120, 24)).columns, 118))
 
@@ -112,6 +112,15 @@ def main(argv: list[str] | None = None) -> int:
             except ClinicConfigError as err:
                 console.print(f"[red]configuration error:[/] {err}")
                 return 2
+            except SandboxInfraError as err:
+                # Our sandbox broke, so the fix was never actually tested. Saying
+                # "fix failed" here would blame the skill for our outage.
+                r.seconds += err.seconds
+                r.status = INFRA_STATUS
+                r.output = (r.output + "\n\n[clinic] fix unverified (infrastructure):\n"
+                            + str(err))[-4000:]
+                console.print("      [magenta]INFRA_ERROR[/] fix unverified (infrastructure)")
+                continue
             r.seconds += secs
             if code == 0:
                 r.status = "FIXED"

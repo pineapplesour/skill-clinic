@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 
 from rich.console import Console
@@ -19,7 +20,6 @@ _STATUS_STYLE = {
     "PASS": "bold green",
     "FIXED": "bold cyan",
     "FAIL": "bold red",
-    "SKIP": "dim",
     INFRA_STATUS: "bold magenta",
 }
 
@@ -45,6 +45,14 @@ def decide_verdict(results) -> str:
     if all((r.category in ENV_CATEGORIES) for r in unresolved):
         return "ENV_SPECIFIC"
     return "BROKEN"
+
+
+def _heading(r) -> str:
+    """`3. Install` - but never `3. 3. Install` when the heading was already numbered."""
+    title = (r.title or "").strip()
+    if re.match(r"^\d+[.)]\s", title):
+        return title
+    return f"{r.index}. {title}"
 
 
 def _truncate(text: str, width: int = 60) -> str:
@@ -83,7 +91,7 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "verdict": verdict,
         "counts": {s: sum(1 for r in results if r.status == s)
-                   for s in ("PASS", "FAIL", "FIXED", "SKIP", INFRA_STATUS)},
+                   for s in ("PASS", "FAIL", "FIXED", INFRA_STATUS)},
         **meta,
         "steps": [r.to_dict() for r in results],
     }
@@ -98,7 +106,7 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
         f"- **Verdict: {verdict}**",
         f"- Steps: {len(results)} "
         f"(PASS {payload['counts']['PASS']}, FIXED {payload['counts']['FIXED']}, "
-        f"FAIL {payload['counts']['FAIL']}, SKIP {payload['counts']['SKIP']}, "
+        f"FAIL {payload['counts']['FAIL']}, "
         f"infrastructure errors {payload['counts'][INFRA_STATUS]})",
         "",
         "| # | Step | Command | Status | Category | Sec | Judge |",
@@ -113,7 +121,7 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
     lines.append("")
     lines.append("## Evidence")
     for r in results:
-        lines += ["", f"### {r.index}. {r.title} - {r.status}", "",
+        lines += ["", f"### {_heading(r)} - {r.status}", "",
                   "```bash", r.command, "```", "",
                   f"- exit code: `{r.exit_code}` / {r.seconds:.1f}s"]
         if r.category:
