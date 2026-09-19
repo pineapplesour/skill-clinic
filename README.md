@@ -180,4 +180,19 @@ Built at the hackathon by **pineapplesour** — Daytona for execution, Nosana fo
 
 ## Evidence: Nosana-judged run
 
-(filled in below by the recorded run)
+GPU jobs provisioned today with `nosana_deploy.py` (credit-paid, via `POST /jobs/list`; all three left in the
+account's job history so a judge can verify them):
+
+| Job address | Market | Template | Credits reserved | Posted (KST) |
+|---|---|---|---|---|
+| `61ZrXT3m5zhaHxtBFef6pwrvYEJqcH9KVgXJUQ9eiLfG` | nvidia-3090 | qwen3-5-9b (Ollama `qwen3.5:9b`) | $0.175 | 14:29 |
+| `CEfGCgWN5ncbCfrLCUBqQNMPnVBPoEN5tH6wwMDXdDrS` | nvidia-4090 | gemma3-4b (Ollama `gemma3:4b-it-qat`) | $0.364 | 14:29 |
+| `FEeohir6hBTYqtM6LT5d7JLEQiVrhHofGKPxmFRDZfXW` | nvidia-4090 | gemma3-4b on the market's pre-cached `ollama:0.15.4` image | $0.364 | 14:48 |
+
+Endpoints: `https://<job>.node.k8s.prd.nos.ci` (Ollama; OpenAI-compatible under `/v1`). Explorer: `https://explore.nosana.com/jobs/<job>`.
+
+Honest status at the time of writing: the nodes accepted all three jobs within seconds (state RUNNING, node assigned) but
+were still pulling the model image ("Service Initializing", HTTP 503) for 20+ minutes. The recorded run below is appended
+the moment an endpoint answers; if this section still ends here, the LLM judge was never reached and every report in
+`reports/` says so explicitly (`judge: rules`). We do not fake it.
+
