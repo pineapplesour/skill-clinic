@@ -10,9 +10,12 @@ Flow (all real Nosana API calls, credit-based, no wallet needed):
 
 Usage:
   set -a; source .env; set +a
-  python nosana_deploy.py --template qwen3-5-9b --market nvidia-3090 --wait
-  python nosana_deploy.py --status <job-address>
-  python nosana_deploy.py --stop <job-address>
+  .venv/bin/python nosana_deploy.py --template qwen3-5-9b --market nvidia-3090 --wait
+  .venv/bin/python nosana_deploy.py --status <job-address>
+  .venv/bin/python nosana_deploy.py --stop <job-address>
+
+IPFS pinning uses NOSANA_PINATA_JWT when set; otherwise the public, rate-limited
+nosana-kit default below (so the script keeps working with no extra setup).
 """
 from __future__ import annotations
 
@@ -28,9 +31,15 @@ import requests
 API = "https://api.nosana.com/api"
 NODE_URL = "https://{job}.node.k8s.prd.nos.ci"
 # Scoped, rate-limited Pinata key shipped as the default in nosana-kit/packages/ipfs/src/defaults.
-PINATA_JWT = (
+# Intentionally public upstream; override it with NOSANA_PINATA_JWT to use your own key.
+DEFAULT_PUBLIC_PINATA_JWT = (
     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJmZDUwODE1NS1jZDJhLTRlMzYtYWI4MC0wNmMxNjRmZWY1MTkiLCJlbWFpbCI6Implc3NlQG5vc2FuYS5pbyIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJwaW5fcG9saWN5Ijp7InJlZ2lvbnMiOlt7ImlkIjoiRlJBMSIsImRlc2lyZWRSZXBsaWNhdGlvbkNvdW50IjoxfV0sInZlcnNpb24iOjF9LCJtZmFfZW5hYmxlZCI6ZmFsc2UsInN0YXR1cyI6IkFDVElWRSJ9LCJhdXRoZW50aWNhdGlvblR5cGUiOiJzY29wZWRLZXkiLCJzY29wZWRLZXlLZXkiOiI1YzVhNWM2N2RlYWU2YzNhNzEwOCIsInNjb3BlZEtleVNlY3JldCI6ImYxOWFjZDUyZDk4ZTczNjU5MmEyY2IzZjQwYWUxNGE2ZmYyYTkxNDJjZTRiN2EzZGQ5OTYyOTliMmJkN2IzYzEiLCJpYXQiOjE2ODY3NzE5Nzl9.r4_pWCCT79Jis6L3eegjdBdAt5MpVd1ymDkBuNE25g8"
 )
+
+
+def pinata_jwt() -> str:
+    """Your own Pinata JWT if NOSANA_PINATA_JWT is set, else the public default."""
+    return os.environ.get("NOSANA_PINATA_JWT") or DEFAULT_PUBLIC_PINATA_JWT
 
 
 def _headers() -> dict:
@@ -61,10 +70,17 @@ def markets() -> list[dict]:
 def market_address(slug_or_address: str) -> str:
     if len(slug_or_address) > 30:
         return slug_or_address
-    for m in markets():
-        if m["slug"] == slug_or_address:
-            return m["address"]
-    sys.exit(f"unknown market slug: {slug_or_address}")
+    listing = markets()
+    if not isinstance(listing, list):
+        sys.exit(f"GET /markets: expected a list of markets, got {type(listing).__name__}")
+    for m in listing:
+        if isinstance(m, dict) and m.get("slug") == slug_or_address:
+            address = m.get("address")
+            if not address:
+                sys.exit(f"market '{slug_or_address}' has no address field")
+            return address
+    known = ", ".join(sorted(str(m.get("slug")) for m in listing if isinstance(m, dict)))[:300]
+    sys.exit(f"unknown market slug: {slug_or_address}\n  known slugs: {known}")
 
 
 def template_job_definition(template_id: str) -> dict:
@@ -77,26 +93,48 @@ def template_job_definition(template_id: str) -> dict:
 
 
 def pin_to_ipfs(job_definition: dict) -> str:
-    r = requests.post(
-        "https://api.pinata.cloud/pinning/pinJSONToIPFS",
-        headers={"Authorization": f"Bearer {PINATA_JWT}", "content-type": "application/json"},
-        json=job_definition,
-        timeout=60,
-    )
-    r.raise_for_status()
-    return r.json()["IpfsHash"]
+    try:
+        r = requests.post(
+            "https://api.pinata.cloud/pinning/pinJSONToIPFS",
+            headers={"Authorization": f"Bearer {pinata_jwt()}", "content-type": "application/json"},
+            json=job_definition,
+            timeout=60,
+        )
+    except requests.RequestException as err:
+        sys.exit(f"IPFS pin: could not reach Pinata ({type(err).__name__}: {err})")
+    if not r.ok:
+        sys.exit(f"IPFS pin failed {r.status_code}: {r.text[:400]}\n"
+                 "  The built-in public nosana-kit key is rate-limited; "
+                 "set NOSANA_PINATA_JWT to your own Pinata JWT.")
+    try:
+        data = r.json()
+    except ValueError:
+        sys.exit(f"IPFS pin: response was not JSON: {r.text[:200]}")
+    ipfs_hash = data.get("IpfsHash") if isinstance(data, dict) else None
+    if not ipfs_hash:
+        sys.exit(f"IPFS pin: no IpfsHash in the Pinata response: {str(data)[:200]}")
+    return ipfs_hash
 
 
 def post_job(ipfs_hash: str, market: str, timeout_s: int = 3600) -> dict:
-    r = requests.post(
-        f"{API}/jobs/list",
-        headers={**_headers(), "Idempotency-Key": str(uuid.uuid4())},
-        json={"ipfsHash": ipfs_hash, "market": market, "timeout": timeout_s},
-        timeout=90,
-    )
+    try:
+        r = requests.post(
+            f"{API}/jobs/list",
+            headers={**_headers(), "Idempotency-Key": str(uuid.uuid4())},
+            json={"ipfsHash": ipfs_hash, "market": market, "timeout": timeout_s},
+            timeout=90,
+        )
+    except requests.RequestException as err:
+        sys.exit(f"POST /jobs/list: could not reach {API} ({type(err).__name__}: {err})")
     if not r.ok:
         sys.exit(f"jobs/list failed {r.status_code}: {r.text[:400]}")
-    return r.json()
+    try:
+        data = r.json()
+    except ValueError:
+        sys.exit(f"POST /jobs/list: response was not JSON: {r.text[:200]}")
+    if not isinstance(data, dict) or not data.get("job"):
+        sys.exit(f"POST /jobs/list: no job address in the response: {str(data)[:300]}")
+    return data
 
 
 def job_status(job: str) -> dict:
