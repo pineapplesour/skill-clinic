@@ -73,6 +73,8 @@ so our fixture avoids it (see Limitations).
 
 ## Nosana usage
 
+Two real paths, both credit-billed with the same API key: (a) the hosted inference API `https://inference.nosana.com/v1` (used for the recorded run — set `LLM_BASE_URL`/`LLM_MODEL`/`LLM_API_KEY`), and (b) a dedicated GPU job provisioned by `nosana_deploy.py` (below) when you want your own model/endpoint.
+
 The failure judge runs on a **credit-paid Nosana GPU job** that `nosana_deploy.py` provisions end to
 end — no wallet, no manual dashboard step:
 
@@ -243,7 +245,23 @@ account's job history so a judge can verify them):
 
 Endpoints: `https://<job>.node.k8s.prd.nos.ci` (Ollama; OpenAI-compatible under `/v1`). Explorer: `https://explore.nosana.com/jobs/<job>`.
 
-Honest status at the time of writing: the nodes accepted all four jobs within seconds (state RUNNING, node assigned) but
+### Recorded Nosana-judged run (15:34 KST)
+
+Nosana also exposes a hosted, credit-billed, OpenAI-compatible inference API (`https://inference.nosana.com/v1`,
+same `nos_…` key). That is the simplest integration and it is what the recorded run below used:
+
+```bash
+export LLM_BASE_URL=https://inference.nosana.com/v1 LLM_MODEL=qwen/qwen3.8-27b LLM_API_KEY=$NOSANA_API_KEY
+.venv/bin/python clinic.py fixtures/stale-daytona-quickstart --fix
+```
+
+Result (`reports/stale-daytona-quickstart-20260919-153427.md`): `judge backends used: nosana:qwen/qwen3.8-27b ×3` —
+step 3 → `stale_command`, fix `pip install daytona`, re-verified **FIXED** in a fresh sandbox; step 4 → `stale_package`
+(the model proposed no fix, so the row stays FAIL — the rules path knows the `@daytonaio → @daytona` rename, the model did not);
+step 5 → `missing_secret`, no fix invented. Verdict BROKEN by exit codes, exactly as the rules run, with a different fix
+coverage — which is the point: the judge only classifies, execution decides.
+
+Earlier status note (kept for honesty): the nodes accepted all four jobs within seconds (state RUNNING, node assigned) but
 were still pulling the model image ("Service Initializing", HTTP 503) for 20+ minutes. The recorded run below is appended
 the moment an endpoint answers; if this section still ends here, the LLM judge was never reached and every report in
 `reports/` says so explicitly (`judge: rules`). We do not fake it.
