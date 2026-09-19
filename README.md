@@ -50,15 +50,15 @@ Every step in a report was produced by these SDK calls — nothing is simulated:
 
 | Call | Where | Why |
 |------|-------|-----|
-| `Daytona()` | `clinic/sandbox.py:90` | client from `DAYTONA_API_KEY` / `DAYTONA_TARGET` |
-| `client.create()` | `clinic/sandbox.py:110` | fresh disposable sandbox per run (~1.5-3s warm) |
-| `sandbox.fs.upload_file(archive, "skill.tar.gz")` | `clinic/sandbox.py:138` | ship the whole skill dir (`tarfile` gzip, `clinic/sandbox.py:75`) |
-| `sandbox.process.exec("bash -lc 'tar xzf ...'", timeout=120)` | `clinic/sandbox.py:139` | unpack into `/home/daytona/skill` |
-| `sandbox.process.exec(cmd, cwd=WORKDIR, timeout=...)` | `clinic/sandbox.py:158` | run one skill step; `exit_code` is the only source of truth |
-| `sandbox.delete()` | `clinic/sandbox.py:128` | in `close()`, always reached via `__exit__` / `finally` |
+| `Daytona()` | `clinic/sandbox.py:94` | client from `DAYTONA_API_KEY` / `DAYTONA_TARGET` |
+| `client.create()` | `clinic/sandbox.py:114` | fresh disposable sandbox per run (~1.5-3s warm) |
+| `sandbox.fs.upload_file(archive, "skill.tar.gz")` | `clinic/sandbox.py:142` | ship the whole skill dir (`tarfile` gzip, `clinic/sandbox.py:79`) |
+| `sandbox.process.exec("bash -lc 'tar xzf ...'", timeout=120)` | `clinic/sandbox.py:143` | unpack into `/home/daytona/skill` |
+| `sandbox.process.exec(cmd, cwd=WORKDIR, timeout=...)` | `clinic/sandbox.py:162` | run one skill step; `exit_code` is the only source of truth |
+| `sandbox.delete()` | `clinic/sandbox.py:132` | in `close()`, always reached via `__exit__` / `finally` |
 
 Sandbox A runs all steps sequentially so state persists (installs from step 1 are visible in step 4).
-Fix re-verification always uses a **new** sandbox (`verify_fix`, `clinic/sandbox.py:199`) so a fix can
+Fix re-verification always uses a **new** sandbox (`verify_fix`, `clinic/sandbox.py:203`) so a fix can
 never be credited to leftover state.
 
 A sandbox is never leaked: if the upload into a freshly created sandbox fails, `__enter__` calls
@@ -208,7 +208,8 @@ report shows what it attempted and what stopped it:
   observations with evidence, and a human decides.
 - Fixture: `fixtures/injected-notes-skill` (a plausible notes indexer with four injected steps). Real run today:
   `reports/injected-notes-skill-*.md` → `SECURITY: SUSPICIOUS (4 high)`, `security: 4 high, 1 medium, 4 low`,
-  with the exfil attempts recorded as blocked by the sandbox network policy and no secret present to leak.
+  the `curl | sh` step recorded as `egress_blocked` (DNS refused), the key-exfil step recorded as `no_secret_present`, and every injected command listed with its rule and evidence.
+  Note on the status column: an injected step can still show PASS, because a shell pipeline's exit status is its *last* command's (`curl … | sh` exits 0 on empty input). The security findings, not the status column, describe what was attempted.
 
 Why this needs Daytona rather than a local VM: every skill gets its own fresh machine, nothing of yours is on it,
 and it is deleted afterwards. The skill can try; it cannot reach anything.

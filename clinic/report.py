@@ -81,7 +81,7 @@ def render_table(console: Console, skill_name: str, results) -> None:
     table.add_column("Command", max_width=60, overflow="ellipsis")
     table.add_column("Status", width=6)
     table.add_column("Category", width=30, overflow="fold")
-    table.add_column("Sec", justify="right", width=5)
+    table.add_column("Time", justify="right", width=5)
     table.add_column("Judge", width=12, overflow="ellipsis")
     for r in results:
         table.add_row(
@@ -148,7 +148,7 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
         f"FAIL {payload['counts']['FAIL']}, "
         f"infrastructure errors {payload['counts'][INFRA_STATUS]})",
         "",
-        "| # | Step | Command | Status | Category | Sec | Judge |",
+        "| # | Step | Command | Status | Category | Time | Judge |",
         "|---|------|---------|--------|----------|-----|-------|",
     ]
     for r in results:

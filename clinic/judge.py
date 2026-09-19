@@ -139,10 +139,13 @@ def classify_with_rules(command: str, output: str, exit_code: int = 1) -> dict:
     if not m and _MISSING_INPUT.search(haystack):
         return {"category": "example_snippet", "explanation": _EXPLANATIONS["example_snippet"],
                 "fix_command": None, "confidence": 0.7, "judge": "rules"}
-    for name, pattern in _RULES:
-        if re.search(pattern, haystack, re.IGNORECASE):
-            category = name
-            break
+    if not haystack.strip() and exit_code in (6, 7, 28, 35, 56) and re.search(r"\b(curl|wget)\b", command or ""):
+        category = "network_blocked"  # curl/wget DNS/connect/timeout codes with silent output (-s)
+    else:
+        for name, pattern in _RULES:
+            if re.search(pattern, haystack, re.IGNORECASE):
+                category = name
+                break
     fix = _suggest_fix(command, haystack, category)
     if category == "missing_secret":
         fix = None  # never invent a credential
