@@ -211,6 +211,7 @@ account's job history so a judge can verify them):
 | `61ZrXT3m5zhaHxtBFef6pwrvYEJqcH9KVgXJUQ9eiLfG` | nvidia-3090 | qwen3-5-9b (Ollama `qwen3.5:9b`) | $0.175 | 14:29 |
 | `CEfGCgWN5ncbCfrLCUBqQNMPnVBPoEN5tH6wwMDXdDrS` | nvidia-4090 | gemma3-4b (Ollama `gemma3:4b-it-qat`) | $0.364 | 14:29 |
 | `FEeohir6hBTYqtM6LT5d7JLEQiVrhHofGKPxmFRDZfXW` | nvidia-4090 | gemma3-4b on the market's pre-cached `ollama:0.15.4` image | $0.364 | 14:48 |
+| `2VDxfcfyncNFLfmg4JEPBq574jWuV9VMBiAr1iiPaq1M` | nvidia-4090 | vLLM `Qwen/Qwen2.5-3B-Instruct` on the market's pre-cached `vllm-openai:v0.10.2` image (OpenAI-compatible `/v1`) | $0.364 | 15:00 |
 
 Endpoints: `https://<job>.node.k8s.prd.nos.ci` (Ollama; OpenAI-compatible under `/v1`). Explorer: `https://explore.nosana.com/jobs/<job>`.
 
