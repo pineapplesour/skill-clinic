@@ -94,6 +94,12 @@ def test_rules_classifier_categories_and_fixes():
     assert secret["category"] == "missing_secret"
     assert secret["fix_command"] is None  # never invents a credential
 
+    renamed = classify_with_rules(
+        "npm install @daytonaio/daytona-sdk",
+        "npm error code E404\nnpm error 404 Not Found - GET .../@daytonaio%2fdaytona-sdk")
+    assert renamed["category"] == "stale_package"
+    assert renamed["fix_command"] == "npm install @daytona/sdk"
+
     assert classify_with_rules("pip install ghostpkg",
                                "ERROR: No matching distribution found for ghostpkg"
                                )["category"] == "stale_package"

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import shutil
 import sys
 
 from rich.console import Console
@@ -13,7 +14,7 @@ from .judge import classify
 from .report import decide_verdict, render_table, write_reports
 from .sandbox import run_steps, verify_fix
 
-console = Console()
+console = Console(width=max(shutil.get_terminal_size((120, 24)).columns, 118))
 
 
 def _log(msg: str) -> None:

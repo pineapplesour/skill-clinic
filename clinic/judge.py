@@ -63,9 +63,10 @@ def _suggest_fix(command: str, output: str, category: str) -> str | None:
         if stripped != cmd:
             return stripped.strip()
 
-    # npm scope rename: @daytonaio/* -> @daytona/*
+    # npm scope rename: the @daytonaio scope moved to @daytona.
     if "@daytonaio/" in cmd and re.search(r"404|E404|deprecated", output or ""):
-        return cmd.replace("@daytonaio/", "@daytona/")
+        renamed = re.sub(r"@daytonaio/(?:daytona-)?sdk", "@daytona/sdk", cmd)
+        return renamed if renamed != cmd else cmd.replace("@daytonaio/", "@daytona/")
 
     # Generic: unknown CLI option reported verbatim by the tool.
     if category == "stale_command":

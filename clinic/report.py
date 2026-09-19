@@ -40,7 +40,7 @@ def _truncate(text: str, width: int = 60) -> str:
 def render_table(console: Console, skill_name: str, results) -> None:
     table = Table(title=f"Skill Clinic - {skill_name}", header_style="bold magenta")
     table.add_column("#", justify="right", width=3)
-    table.add_column("Step", max_width=22, overflow="ellipsis")
+    table.add_column("Step", max_width=26, overflow="ellipsis")
     table.add_column("Command", max_width=60, overflow="ellipsis")
     table.add_column("Status", width=6)
     table.add_column("Category", width=15)

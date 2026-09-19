@@ -30,10 +30,12 @@ Older pip resolvers pick the wrong transitive versions, so force the new one:
 pip install --use-feature=2020-resolver daytona
 ```
 
-## 4. Create your first sandbox from the CLI
+## 4. Add the legacy Node package
+
+Some older projects still pull the sandbox helpers from the original package name:
 
 ```bash
-daytona sandbox create --name demo
+npm install @daytonaio/daytona-sdk
 ```
 
 ## 5. Check your credentials
