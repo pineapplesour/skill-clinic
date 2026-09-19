@@ -61,7 +61,7 @@ u { text-decoration:none; border-bottom:3px solid var(--accent); padding-bottom:
 table.data { border-collapse:collapse; width:100%; table-layout:fixed; }
 table.data th { font-size:13px; letter-spacing:2px; text-transform:uppercase; color:var(--accent-soft);
                 font-weight:700; text-align:left; padding:0 12px 9px; border-bottom:2px solid var(--accent); }
-table.data td { font-size:17px; line-height:1.4; padding:11px 12px; vertical-align:middle;
+table.data td { font-size:16px; line-height:1.3; padding:7px 12px; vertical-align:middle;
                 border-bottom:1px solid var(--rule); }
 table.data tr:nth-child(even) td { background:#f2f2f6; }
 table.data code { font-size:15px; background:none; padding:0; color:var(--ink); }
@@ -74,8 +74,8 @@ table.data code { font-size:15px; background:none; padding:0; color:var(--ink); 
 .p-env    { background:#fef3c7; color:#92400e; }
 .p-ok     { background:#dcfce7; color:#15803d; }
 
-.note { margin-top:22px; font-size:18px; line-height:1.55; }
-.note + .note { margin-top:11px; }
+.note { margin-top:12px; font-size:16px; line-height:1.45; }
+.note + .note { margin-top:6px; }
 .note b { color:var(--accent); }
 
 /* ---- one thin footer line ---- */
@@ -139,7 +139,7 @@ table.data code { font-size:15px; background:none; padding:0; color:var(--ink); 
     <tr><td class="skillname">healthy-csv-summary</td><td>4단계</td><td><span class="pill p-ok">HEALTHY</span></td><td>-</td><td>-</td></tr>
     <tr><td class="skillname">anthropics/skills · pdf<br><span style="font-weight:400;font-size:12px;color:#666">제3자, 무수정</span></td><td><code>pdftotext</code> <code>qpdf</code> <code>pdftk</code> <code>pdfimages</code></td><td><span class="pill p-fail">BROKEN</span></td><td>missing_tool ×4</td><td>apt 자동 설치 후 재실행 → 예시 파일(input.pdf) 부재</td></tr>
   </table>
-  <p class="note" style="margin-top:10px">덤으로 잡은 것: 샌드박스 기본 이미지의 <code>daytona</code> 바이너리는 CLI가 아니라 툴박스 데몬이라 옛 명령 <code>daytona sandbox create</code>가 <b>조용히 exit 0</b>. 이런 게 스킬 부패다.</p>
+  <p class="note">덤으로 잡은 것: 샌드박스 기본 이미지의 <code>daytona</code> 바이너리는 CLI가 아니라 툴박스 데몬이라 옛 명령 <code>daytona sandbox create</code>가 <b>조용히 exit 0</b>. 이런 게 스킬 부패다.</p>
   <p class="note"><b>다음</b>: 배포판×런타임 매트릭스(스냅샷 팬아웃) · 자동 PR · skills 레지스트리용 검진 배지</p>
   <div class="foot"><table><tr>
     <td>Team: pineapplesour</td>
