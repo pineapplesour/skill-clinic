@@ -77,7 +77,7 @@ The failure judge runs on a **credit-paid Nosana GPU job** that `nosana_deploy.p
 end — no wallet, no manual dashboard step:
 
 ```bash
-python nosana_deploy.py --template qwen3-5-9b --market nvidia-3090 --wait
+.venv/bin/python nosana_deploy.py --template qwen3-5-9b --market nvidia-3090 --wait
 ```
 
 1. fetch the official Nosana template job definition (Ollama server + model) — `GET /api/templates/<id>`
@@ -94,7 +94,7 @@ export LLM_API_KEY=x
 
 `clinic/judge.py` consumes exactly those three variables through an **OpenAI-compatible client**
 (`classify_with_llm`), so the GPU job is a drop-in judge backend. Lifecycle is managed from the same
-script: `python nosana_deploy.py --status <job>` and `python nosana_deploy.py --stop <job>`.
+script: `.venv/bin/python nosana_deploy.py --status <job>` and `.venv/bin/python nosana_deploy.py --stop <job>`.
 
 Every report row records which backend actually judged it — `judge: "nosana:<model>"` or
 `judge: "rules"` — and the CLI prints the tally at the end (`judge backends used: nosana:qwen3.5:9b ×2,
@@ -138,6 +138,11 @@ A demo that ends with exit `1` is the tool succeeding at its job.
 Step 2 (`npm install @daytonaio/sdk`) prints npm's deprecation notice but exits 0, so it is reported
 as PASS. We do not downgrade a step the tool itself considered successful.
 
+The table above is the `--no-llm` (deterministic rules) result, so it is reproducible without a GPU.
+With `LLM_BASE_URL` set, the pass/fail column is unchanged — exit codes still decide it — but the
+**Category** column comes from the Nosana-hosted model instead of the rules, and each row records
+which one judged it (`judge: nosana:<model>` vs `judge: rules`).
+
 ## Judging rules
 
 - **The exit code decides pass/fail. Always. In code.** (`clinic/report.py:decide_verdict`,
@@ -146,6 +151,9 @@ as PASS. We do not downgrade a step the tool itself considered successful.
   `stale_package`, `stale_command`, `missing_secret`, `env_specific`, `network_blocked`, `bug`, `unknown`.
 - A proposed fix is only ever reported as `FIXED` after it exits 0 in a fresh sandbox.
 - `missing_secret` never gets a `fix_command` — we do not invent credentials.
+- Before any error-message heuristic, the **command text itself** is prechecked for host-specific
+  commands (`powershell`, `*.exe`, `/mnt/c/...`, `C:\...`, `wsl`, `brew`, `sudo`, `systemctl`,
+  `osascript`) and classified `env_specific` (`clinic/judge.py:_ENV_CMD`).
 
 ### Known rot rules
 
