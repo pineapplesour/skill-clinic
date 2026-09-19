@@ -13,6 +13,19 @@ from daytona import Daytona
 REMOTE_HOME = "/home/daytona"
 WORKDIR = f"{REMOTE_HOME}/skill"
 MAX_OUTPUT = 4000
+INFRA_EXIT_CODE = 124
+
+
+class ClinicConfigError(RuntimeError):
+    """Bad/missing local configuration - report it to the user, never as a traceback."""
+
+
+class SandboxInfraError(RuntimeError):
+    """The SDK/network failed - this says nothing about the skill step itself."""
+
+    def __init__(self, message: str, seconds: float = 0.0):
+        super().__init__(message)
+        self.seconds = seconds
 
 
 @dataclass
@@ -63,13 +76,28 @@ def _tar_skill(skill_dir: str) -> str:
     return archive
 
 
+def _make_client() -> Daytona:
+    """Build the Daytona client, turning config problems into readable messages."""
+    if not os.environ.get("DAYTONA_API_KEY"):
+        raise ClinicConfigError(
+            "DAYTONA_API_KEY is not set, so no sandbox can be created.\n"
+            "  Put it in .env and load it:  set -a; source .env; set +a")
+    try:
+        return Daytona()
+    except Exception as err:
+        raise ClinicConfigError(
+            f"could not create the Daytona client ({type(err).__name__}: {err}).\n"
+            "  Check DAYTONA_API_KEY / DAYTONA_TARGET in .env, then: "
+            "set -a; source .env; set +a") from err
+
+
 class SkillSandbox:
     """A single Daytona sandbox with the skill directory unpacked at ~/skill."""
 
     def __init__(self, skill_dir: str, log=print):
         self.skill_dir = skill_dir
         self.log = log
-        self.client = Daytona()
+        self.client = _make_client()
         self.sandbox = None
         self.id = "?"
 
@@ -78,7 +106,12 @@ class SkillSandbox:
         self.sandbox = self.client.create()
         self.id = getattr(self.sandbox, "id", "?")
         self.log(f"  [sandbox] created {self.id} in {time.time() - t0:.1f}s")
-        self._upload()
+        try:
+            self._upload()
+        except BaseException:
+            # never leak a sandbox we already created
+            self.close()
+            raise
         return self
 
     def __exit__(self, *exc) -> bool:
@@ -123,7 +156,10 @@ class SkillSandbox:
             )
             exit_code, output = res.exit_code, (res.result or "")
         except Exception as err:
-            exit_code, output = 124, f"[clinic] execution error: {err}"
+            raise SandboxInfraError(
+                f"[clinic] execution error ({type(err).__name__}): {err}",
+                time.time() - t0,
+            ) from err
         return exit_code, output[-MAX_OUTPUT:], time.time() - t0
 
 
@@ -135,7 +171,18 @@ def run_steps(skill_dir: str, steps, timeout: int = 180, log=print,
         log(f"  [sandbox {label}] running {len(steps)} step(s)")
         for step in steps:
             log(f"  [step {step.index}/{len(steps)}] {step.first_line[:70]}")
-            code, out, secs = sb.run(step.command, timeout=timeout)
+            try:
+                code, out, secs = sb.run(step.command, timeout=timeout)
+            except SandboxInfraError as err:
+                # Infrastructure, not the skill: never judged, never counted against it.
+                code, out, secs = INFRA_EXIT_CODE, str(err), err.seconds
+                log(f"      -> INFRA_ERROR in {secs:.1f}s ({out[:80]})")
+                results.append(StepResult(
+                    index=step.index, title=step.title, command=step.command,
+                    exit_code=code, output=out, seconds=secs,
+                    status="INFRA_ERROR",
+                ))
+                continue
             log(f"      -> exit {code} in {secs:.1f}s")
             results.append(StepResult(
                 index=step.index, title=step.title, command=step.command,
@@ -149,10 +196,13 @@ def verify_fix(skill_dir: str, prior_commands: list[str], fix_command: str,
                timeout: int = 180, log=print) -> tuple[int, str, float]:
     """Replay previously-passing steps + the fix in a FRESH sandbox."""
     with SkillSandbox(skill_dir, log=log) as sb:
-        for cmd in prior_commands:
-            sb.run(cmd, timeout=timeout)
-        log(f"      [fix] {fix_command[:70]}")
-        return sb.run(fix_command, timeout=timeout)
+        try:
+            for cmd in prior_commands:
+                sb.run(cmd, timeout=timeout)
+            log(f"      [fix] {fix_command[:70]}")
+            return sb.run(fix_command, timeout=timeout)
+        except SandboxInfraError as err:
+            return INFRA_EXIT_CODE, str(err), err.seconds
 
 
 def fresh(skill_dir: str, log=print) -> SkillSandbox:

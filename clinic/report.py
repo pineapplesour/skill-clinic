@@ -11,16 +11,31 @@ from rich.table import Table
 
 ENV_CATEGORIES = {"missing_secret", "env_specific", "network_blocked"}
 
+#: Steps whose sandbox call itself failed (SDK/network). They say nothing about the
+#: skill, are never sent to the judge, and never move the verdict.
+INFRA_STATUS = "INFRA_ERROR"
+
 _STATUS_STYLE = {
     "PASS": "bold green",
     "FIXED": "bold cyan",
     "FAIL": "bold red",
     "SKIP": "dim",
+    INFRA_STATUS: "bold magenta",
 }
 
 
+def count_infra_errors(results) -> int:
+    """How many steps failed because of our infrastructure, not the skill."""
+    return sum(1 for r in results if r.status == INFRA_STATUS)
+
+
 def decide_verdict(results) -> str:
-    """Exit codes decide everything here - the model never votes."""
+    """Exit codes decide everything here - the model never votes.
+
+    ``INFRA_ERROR`` steps are excluded entirely: a Daytona SDK or network failure on
+    our side is not evidence about the skill, so it is reported separately instead.
+    """
+    results = [r for r in results if r.status != INFRA_STATUS]
     failures = [r for r in results if r.status in ("FAIL", "FIXED")]
     if not failures:
         return "HEALTHY"
@@ -68,7 +83,7 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
         "generated_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "verdict": verdict,
         "counts": {s: sum(1 for r in results if r.status == s)
-                   for s in ("PASS", "FAIL", "FIXED", "SKIP")},
+                   for s in ("PASS", "FAIL", "FIXED", "SKIP", INFRA_STATUS)},
         **meta,
         "steps": [r.to_dict() for r in results],
     }
@@ -83,7 +98,8 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
         f"- **Verdict: {verdict}**",
         f"- Steps: {len(results)} "
         f"(PASS {payload['counts']['PASS']}, FIXED {payload['counts']['FIXED']}, "
-        f"FAIL {payload['counts']['FAIL']}, SKIP {payload['counts']['SKIP']})",
+        f"FAIL {payload['counts']['FAIL']}, SKIP {payload['counts']['SKIP']}, "
+        f"infrastructure errors {payload['counts'][INFRA_STATUS]})",
         "",
         "| # | Step | Command | Status | Category | Sec | Judge |",
         "|---|------|---------|--------|----------|-----|-------|",
