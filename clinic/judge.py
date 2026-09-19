@@ -37,6 +37,11 @@ _RULES: list[tuple[str, str]] = [
      r"Temporary failure in name resolution"),
 ]
 
+_ENV_CMD = (
+    r"powershell(?:\.exe)?|\bcmd\.exe|/mnt/[a-z]/|[A-Za-z]:\\\\|\bwsl\b|\bbrew\b|"
+    r"\bsudo\b|\bsystemctl\b|\bosascript\b|\.exe\b"
+)
+
 _EXPLANATIONS = {
     "stale_package": "The package or version referenced by the skill no longer resolves on the registry.",
     "stale_command": "The CLI no longer accepts this subcommand/flag; the skill was written against an older version.",
@@ -82,6 +87,16 @@ def classify_with_rules(command: str, output: str, exit_code: int = 1) -> dict:
     """Deterministic regex classifier. Always available, never needs network."""
     haystack = output or ""
     category = "bug"
+    # Host-specific commands (Windows paths, powershell, WSL mounts, sudo/brew) are recognised
+    # from the command text itself, before any error-message heuristics.
+    if re.search(_ENV_CMD, command or "", re.IGNORECASE):
+        return {
+            "category": "env_specific",
+            "explanation": _EXPLANATIONS["env_specific"],
+            "fix_command": None,
+            "confidence": 0.9,
+            "judge": "rules",
+        }
     for name, pattern in _RULES:
         if re.search(pattern, haystack, re.IGNORECASE):
             category = name
