@@ -1,0 +1,77 @@
+{
+  "skill": "healthy-csv-summary",
+  "skill_file": "/home/pineapple/skill-clinic/fixtures/healthy-csv-summary/SKILL.md",
+  "generated_at": "2026-09-19T14:58:53+0900",
+  "verdict": "HEALTHY",
+  "counts": {
+    "PASS": 4,
+    "FAIL": 0,
+    "FIXED": 0,
+    "INFRA_ERROR": 0
+  },
+  "fix_mode": false,
+  "llm_judge": false,
+  "llm_model": null,
+  "steps": [
+    {
+      "index": 1,
+      "title": "1. Install pandas",
+      "command": "pip install pandas",
+      "exit_code": 0,
+      "status": "PASS",
+      "category": null,
+      "explanation": null,
+      "fix_command": null,
+      "confidence": null,
+      "judge": null,
+      "after_fix": null,
+      "seconds": 0.9,
+      "output": "Defaulting to user installation because normal site-packages is not writeable\nRequirement already satisfied: pandas in /usr/local/lib/python3.14/site-packages (2.3.3)\nRequirement already satisfied: numpy>=1.26.0 in /usr/local/lib/python3.14/site-packages (from pandas) (2.4.1)\nRequirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.14/site-packages (from pandas) (2.9.0.post0)\nRequirement already satisfied: pytz>=2020.1 in /usr/local/lib/python3.14/site-packages (from pandas) (2026.2)\nRequirement already satisfied: tzdata>=2022.7 in /usr/local/lib/python3.14/site-packages (from pandas) (2026.2)\nRequirement already satisfied: six>=1.5 in /usr/local/lib/python3.14/site-packages (from python-dateutil>=2.8.2->pandas) (1.17.0)\n\n[notice] A new release of pip is available: 26.0.1 -> 26.2.1\n[notice] To update, run: pip install --upgrade pip\n"
+    },
+    {
+      "index": 2,
+      "title": "2. Create a sample dataset",
+      "command": "printf 'name,team,score\\nada,red,91\\nlin,blue,78\\nrio,red,64\\nmax,blue,88\\n' > data.csv\ncat data.csv",
+      "exit_code": 0,
+      "status": "PASS",
+      "category": null,
+      "explanation": null,
+      "fix_command": null,
+      "confidence": null,
+      "judge": null,
+      "after_fix": null,
+      "seconds": 0.2,
+      "output": "name,team,score\nada,red,91\nlin,blue,78\nrio,red,64\nmax,blue,88\n"
+    },
+    {
+      "index": 3,
+      "title": "3. Run the summarizer",
+      "command": "python scripts/summarize.py data.csv",
+      "exit_code": 0,
+      "status": "PASS",
+      "category": null,
+      "explanation": null,
+      "fix_command": null,
+      "confidence": null,
+      "judge": null,
+      "after_fix": null,
+      "seconds": 0.9,
+      "output": "rows: 4\ncolumns: name, team, score\nmean score: 80.25\nmax score: 91 (ada)\nteam blue: 83.00\nteam red: 77.50\n"
+    },
+    {
+      "index": 4,
+      "title": "4. Check the output file",
+      "command": "test -f summary.txt && cat summary.txt",
+      "exit_code": 0,
+      "status": "PASS",
+      "category": null,
+      "explanation": null,
+      "fix_command": null,
+      "confidence": null,
+      "judge": null,
+      "after_fix": null,
+      "seconds": 0.3,
+      "output": "rows: 4\ncolumns: name, team, score\nmean score: 80.25\nmax score: 91 (ada)\nteam blue: 83.00\nteam red: 77.50\n"
+    }
+  ]
+}

@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import shutil
 import sys
+from collections import Counter
+from pathlib import Path
 
 from rich.console import Console
 
-from collections import Counter
-
 from .extract import load_skill
-from .judge import classify
+from .html_report import write_html
+from .judge import classify, classify_with_rules
 from .report import INFRA_STATUS, count_infra_errors, decide_verdict, render_table, write_reports
 from .sandbox import ClinicConfigError, SandboxInfraError, run_steps, verify_fix
 
@@ -128,7 +130,18 @@ def main(argv: list[str] | None = None) -> int:
                 console.print(f"      [green]FIXED[/] -> `{r.fix_command}` exit 0")
             else:
                 r.output = (r.output + "\n\n[clinic] fix attempt output:\n" + out)[-4000:]
-                console.print(f"      [red]fix failed[/] (exit {code})")
+                # The fix ran and the step still fails - the NEW output may mean
+                # something else entirely (e.g. the tool installed fine, but the
+                # input file was never real). Re-read it with the deterministic
+                # rules classifier; the row stays FAIL, the verdict is untouched.
+                # Classified against the ORIGINAL step command: a fix like
+                # `sudo apt-get install ...` would otherwise be read as env_specific
+                # because of its own sudo, telling us nothing about the step.
+                again = classify_with_rules(r.command, out, code)
+                r.after_fix = {"category": again["category"],
+                               "explanation": again["explanation"]}
+                console.print(f"      [red]fix failed[/] (exit {code}) "
+                              f"-> now: {again['category']}")
 
     verdict = decide_verdict(results)
     console.print()
@@ -150,8 +163,11 @@ def main(argv: list[str] | None = None) -> int:
         skill["name"], skill["file"], results, verdict, out_dir=args.out,
         meta={"fix_mode": args.fix, "llm_judge": use_llm,
               "llm_model": os.environ.get("LLM_MODEL") if use_llm else None})
+    html_path = Path(paths["json"]).with_suffix(".html")
+    write_html(json.loads(Path(paths["json"]).read_text(encoding="utf-8")), html_path)
     console.print(f"report: {paths['md']}")
     console.print(f"report: {paths['json']}")
+    console.print(f"report: {html_path}")
     return 0 if verdict in ("HEALTHY", "FIXABLE") else 1
 
 

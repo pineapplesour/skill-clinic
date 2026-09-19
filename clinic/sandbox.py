@@ -42,6 +42,9 @@ class StepResult:
     fix_command: str | None = None
     confidence: float | None = None
     judge: str | None = None
+    #: Set only when a proposed fix was re-verified and still failed: the rules
+    #: classifier's reading of the NEW output, as {"category", "explanation"}.
+    after_fix: dict | None = None
 
     @property
     def ok(self) -> bool:
@@ -59,6 +62,7 @@ class StepResult:
             "fix_command": self.fix_command,
             "confidence": self.confidence,
             "judge": self.judge,
+            "after_fix": self.after_fix,
             "seconds": round(self.seconds, 1),
             "output": self.output,
         }

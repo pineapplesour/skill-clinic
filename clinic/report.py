@@ -55,6 +55,20 @@ def _heading(r) -> str:
     return f"{r.index}. {title}"
 
 
+def category_cell(r, arrow: str = "->") -> str:
+    """`missing_tool` - or `missing_tool -> example_snippet` when a failed fix was re-read.
+
+    ``after_fix`` is the rules classifier's reading of the output the *fix attempt*
+    produced. It is evidence only: the row stays FAIL and the verdict never moves.
+    """
+    category = getattr(r, "category", None) or (r.get("category") if isinstance(r, dict) else None)
+    if not category:
+        return "-"
+    after_fix = getattr(r, "after_fix", None) if not isinstance(r, dict) else r.get("after_fix")
+    after = (after_fix or {}).get("category")
+    return f"{category} {arrow} {after}" if after else str(category)
+
+
 def _truncate(text: str, width: int = 60) -> str:
     one_line = " ; ".join(text.splitlines())
     return one_line if len(one_line) <= width else one_line[: width - 1] + "…"
@@ -66,14 +80,14 @@ def render_table(console: Console, skill_name: str, results) -> None:
     table.add_column("Step", max_width=26, overflow="ellipsis")
     table.add_column("Command", max_width=60, overflow="ellipsis")
     table.add_column("Status", width=6)
-    table.add_column("Category", width=15)
+    table.add_column("Category", width=30, overflow="fold")
     table.add_column("Sec", justify="right", width=5)
     table.add_column("Judge", width=12, overflow="ellipsis")
     for r in results:
         table.add_row(
             str(r.index), r.title, _truncate(r.command, 60),
             f"[{_STATUS_STYLE.get(r.status, '')}]{r.status}[/]",
-            r.category or "-", f"{r.seconds:.1f}", r.judge or "-",
+            category_cell(r, "\u2192"), f"{r.seconds:.1f}", r.judge or "-",
         )
     console.print(table)
 
@@ -116,7 +130,7 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
         cmd = _truncate(r.command, 60).replace("|", "\\|")
         lines.append(
             f"| {r.index} | {r.title} | `{cmd}` | {r.status} | "
-            f"{r.category or '-'} | {r.seconds:.1f} | {r.judge or '-'} |"
+            f"{category_cell(r, '→')} | {r.seconds:.1f} | {r.judge or '-'} |"
         )
     lines.append("")
     lines.append("## Evidence")
@@ -129,6 +143,9 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
                          f"confidence {r.confidence})")
         if r.explanation:
             lines.append(f"- diagnosis: {r.explanation}")
+        if getattr(r, "after_fix", None):
+            lines.append(f"- after the fix ran (still failing): **{r.after_fix['category']}** "
+                         f"- {r.after_fix.get('explanation', '')}")
         if r.fix_command:
             lines.append(f"- proposed fix: `{r.fix_command}`")
         if r.exit_code != 0:
