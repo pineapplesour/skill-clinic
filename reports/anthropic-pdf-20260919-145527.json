@@ -1,0 +1,73 @@
+{
+  "skill": "anthropic-pdf",
+  "skill_file": "/home/pineapple/skill-clinic/fixtures/third-party/anthropic-pdf/SKILL.md",
+  "generated_at": "2026-09-19T14:55:27+0900",
+  "verdict": "BROKEN",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 4,
+    "FIXED": 0,
+    "INFRA_ERROR": 0
+  },
+  "fix_mode": true,
+  "llm_judge": false,
+  "llm_model": null,
+  "steps": [
+    {
+      "index": 1,
+      "title": "pdftotext (poppler-utils)",
+      "command": "pdftotext input.pdf output.txt\npdftotext -layout input.pdf output.txt\npdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5",
+      "exit_code": 127,
+      "status": "FAIL",
+      "category": "missing_tool",
+      "explanation": "The step calls a binary that a fresh machine does not have; the skill never says to install it. (needs `poppler-utils`)",
+      "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 && pdftotext input.pdf output.txt\npdftotext -layout input.pdf output.txt\npdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5",
+      "confidence": 0.85,
+      "judge": "rules",
+      "seconds": 4.8,
+      "output": "bash: line 1: pdftotext: command not found\nbash: line 2: pdftotext: command not found\nbash: line 3: pdftotext: command not found\n\n\n[clinic] fix attempt output:\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\n"
+    },
+    {
+      "index": 2,
+      "title": "qpdf",
+      "command": "qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf\nqpdf input.pdf --pages . 1-5 -- pages1-5.pdf\nqpdf input.pdf --pages . 6-10 -- pages6-10.pdf\nqpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees\nqpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf",
+      "exit_code": 127,
+      "status": "FAIL",
+      "category": "missing_tool",
+      "explanation": "The step calls a binary that a fresh machine does not have; the skill never says to install it. (needs `qpdf`)",
+      "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq qpdf >/dev/null 2>&1 && qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf\nqpdf input.pdf --pages . 1-5 -- pages1-5.pdf\nqpdf input.pdf --pages . 6-10 -- pages6-10.pdf\nqpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees\nqpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf",
+      "confidence": 0.85,
+      "judge": "rules",
+      "seconds": 1.5,
+      "output": "bash: line 1: qpdf: command not found\nbash: line 2: qpdf: command not found\nbash: line 3: qpdf: command not found\nbash: line 4: qpdf: command not found\nbash: line 5: qpdf: command not found\n\n\n[clinic] fix attempt output:\n\nqpdf: error at * in numeric range *file2.pdf: invalid range syntax\n\nFor help:\n  qpdf --help=usage       usage information\n  qpdf --help=topic       help on a topic\n  qpdf --help=--option    help on an option\n  qpdf --help             general help and a topic list\n\nqpdf: open input.pdf: No such file or directory\nqpdf: open input.pdf: No such file or directory\nqpdf: open input.pdf: No such file or directory\nqpdf: open encrypted.pdf: No such file or directory\n"
+    },
+    {
+      "index": 3,
+      "title": "pdftk (if available)",
+      "command": "pdftk file1.pdf file2.pdf cat output merged.pdf\npdftk input.pdf burst\npdftk input.pdf rotate 1east output rotated.pdf",
+      "exit_code": 127,
+      "status": "FAIL",
+      "category": "missing_tool",
+      "explanation": "The step calls a binary that a fresh machine does not have; the skill never says to install it. (needs `pdftk-java`)",
+      "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq pdftk-java >/dev/null 2>&1 && pdftk file1.pdf file2.pdf cat output merged.pdf\npdftk input.pdf burst\npdftk input.pdf rotate 1east output rotated.pdf",
+      "confidence": 0.85,
+      "judge": "rules",
+      "seconds": 10.4,
+      "output": "bash: line 1: pdftk: command not found\nbash: line 2: pdftk: command not found\nbash: line 3: pdftk: command not found\n\n\n[clinic] fix attempt output:\nError: Unable to find file.\nError: Failed to open input PDF file: \n   file1.pdf\nError: Unable to find file.\nError: Failed to open input PDF file: \n   file2.pdf\nErrors encountered.  No output created.\nDone.  Input errors, so no output created.\nError: Unable to find file.\nError: Failed to open input PDF file: \n   input.pdf\nDone.  Input errors, so no output created.\nError: Unable to find file.\nError: Failed to open input PDF file: \n   input.pdf\nErrors encountered.  No output created.\nDone.  Input errors, so no output created.\n"
+    },
+    {
+      "index": 4,
+      "title": "Extract Images",
+      "command": "pdfimages -j input.pdf output_prefix",
+      "exit_code": 127,
+      "status": "FAIL",
+      "category": "missing_tool",
+      "explanation": "The step calls a binary that a fresh machine does not have; the skill never says to install it. (needs `poppler-utils`)",
+      "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 && pdfimages -j input.pdf output_prefix",
+      "confidence": 0.85,
+      "judge": "rules",
+      "seconds": 4.6,
+      "output": "bash: line 1: pdfimages: command not found\n\n\n[clinic] fix attempt output:\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\n"
+    }
+  ]
+}

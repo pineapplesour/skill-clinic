@@ -1,0 +1,59 @@
+{
+  "skill": "anthropic-docx",
+  "skill_file": "/home/pineapple/skill-clinic/fixtures/third-party/anthropic-docx/SKILL.md",
+  "generated_at": "2026-09-19T14:53:37+0900",
+  "verdict": "BROKEN",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 3,
+    "FIXED": 0,
+    "INFRA_ERROR": 0
+  },
+  "fix_mode": true,
+  "llm_judge": false,
+  "llm_model": null,
+  "steps": [
+    {
+      "index": 1,
+      "title": "Verify the output",
+      "command": "python scripts/office/soffice.py --headless --convert-to pdf output.docx\npdftoppm -jpeg -r 100 output.pdf page\nls page-*.jpg   # then Read the images",
+      "exit_code": 2,
+      "status": "FAIL",
+      "category": "stale_command",
+      "explanation": "The CLI no longer accepts this subcommand/flag; the skill was written against an older version.",
+      "fix_command": null,
+      "confidence": 0.8,
+      "judge": "rules",
+      "seconds": 0.3,
+      "output": "python: can't open file '/home/daytona/skill/scripts/office/soffice.py': [Errno 2] No such file or directory\nbash: line 2: pdftoppm: command not found\nls: cannot access 'page-*.jpg': No such file or directory\n"
+    },
+    {
+      "index": 2,
+      "title": "Editing existing documents",
+      "command": "unzip -q doc.docx -d unpacked/\nfind unpacked -type l -delete   # strip symlink entries \u2014 docx from external parties is untrusted\npython scripts/merge_runs.py unpacked/   # coalesce fragmented runs so text is findable\n(cd unpacked && rm -f ../out.docx && zip -Xr ../out.docx .)\npython scripts/office/validate.py out.docx --original doc.docx   # XSD checks; --auto-repair fixes common issues",
+      "exit_code": 2,
+      "status": "FAIL",
+      "category": "bug",
+      "explanation": "The step failed for a reason specific to the skill's own logic or content.",
+      "fix_command": null,
+      "confidence": 0.4,
+      "judge": "rules",
+      "seconds": 0.3,
+      "output": "unzip:  cannot find or open doc.docx, doc.docx.zip or doc.docx.ZIP.\nfind: \u2018unpacked\u2019: No such file or directory\npython: can't open file '/home/daytona/skill/scripts/merge_runs.py': [Errno 2] No such file or directory\nbash: line 4: cd: unpacked: No such file or directory\npython: can't open file '/home/daytona/skill/scripts/office/validate.py': [Errno 2] No such file or directory\n"
+    },
+    {
+      "index": 3,
+      "title": "Comments",
+      "command": "python scripts/comment.py unpacked/ \"Fees & expenses cap is too low\"\npython scripts/comment.py unpacked/ \"Agreed\" --parent 0\npython scripts/comment.py contract.docx \"This cap is too low\" -o annotated.docx",
+      "exit_code": 2,
+      "status": "FAIL",
+      "category": "bug",
+      "explanation": "The step failed for a reason specific to the skill's own logic or content.",
+      "fix_command": null,
+      "confidence": 0.4,
+      "judge": "rules",
+      "seconds": 0.3,
+      "output": "python: can't open file '/home/daytona/skill/scripts/comment.py': [Errno 2] No such file or directory\npython: can't open file '/home/daytona/skill/scripts/comment.py': [Errno 2] No such file or directory\npython: can't open file '/home/daytona/skill/scripts/comment.py': [Errno 2] No such file or directory\n"
+    }
+  ]
+}

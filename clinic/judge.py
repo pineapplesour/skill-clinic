@@ -9,6 +9,8 @@ import re
 CATEGORIES = [
     "stale_package",
     "stale_command",
+    "missing_tool",
+    "example_snippet",
     "missing_secret",
     "env_specific",
     "network_blocked",
@@ -42,7 +44,19 @@ _ENV_CMD = (
     r"\bsudo\b|\bsystemctl\b|\bosascript\b|\.exe\b"
 )
 
+# Binaries a skill may call that are not in a fresh sandbox image -> Debian package to install.
+TOOL_PACKAGES = {
+    "pdftotext": "poppler-utils", "pdfimages": "poppler-utils", "pdftoppm": "poppler-utils", "pdfinfo": "poppler-utils",
+    "qpdf": "qpdf", "pdftk": "pdftk-java", "convert": "imagemagick", "magick": "imagemagick", "ffmpeg": "ffmpeg",
+    "jq": "jq", "rg": "ripgrep", "tesseract": "tesseract-ocr", "pandoc": "pandoc", "libreoffice": "libreoffice",
+    "soffice": "libreoffice", "gs": "ghostscript", "zip": "zip", "unzip": "unzip", "tree": "tree",
+}
+_CMD_NOT_FOUND = re.compile(r"(?:bash: line \d+: |bash: |sh: \d+: |/bin/sh: \d+: )?([A-Za-z0-9_.+-]+): (?:command )?not found")
+_MISSING_INPUT = re.compile(r"No such file or directory|Couldn't open file|cannot open|can't open|does not exist|not found: .*\.(?:pdf|docx|csv|json|txt)", re.IGNORECASE)
+
 _EXPLANATIONS = {
+    "missing_tool": "The step calls a binary that a fresh machine does not have; the skill never says to install it.",
+    "example_snippet": "The step references example input files that do not exist - it is an illustrative snippet, not a runnable instruction.",
     "stale_package": "The package or version referenced by the skill no longer resolves on the registry.",
     "stale_command": "The CLI no longer accepts this subcommand/flag; the skill was written against an older version.",
     "missing_secret": "The step needs a credential or environment variable that the skill never tells you to set.",
@@ -115,6 +129,16 @@ def classify_with_rules(command: str, output: str, exit_code: int = 1) -> dict:
             "confidence": 0.9,
             "judge": "rules",
         }
+    # A known tool is simply not installed on a fresh machine -> propose the install, then rerun.
+    m = _CMD_NOT_FOUND.search(haystack)
+    if m and m.group(1) in TOOL_PACKAGES:
+        pkg = TOOL_PACKAGES[m.group(1)]
+        fix = f"sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq {pkg} >/dev/null 2>&1 && {command.strip()}"
+        return {"category": "missing_tool", "explanation": _EXPLANATIONS["missing_tool"] + f" (needs `{pkg}`)",
+                "fix_command": fix, "confidence": 0.85, "judge": "rules"}
+    if not m and _MISSING_INPUT.search(haystack):
+        return {"category": "example_snippet", "explanation": _EXPLANATIONS["example_snippet"],
+                "fix_command": None, "confidence": 0.7, "judge": "rules"}
     for name, pattern in _RULES:
         if re.search(pattern, haystack, re.IGNORECASE):
             category = name
