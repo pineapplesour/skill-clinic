@@ -4,9 +4,21 @@ Run an agent skill's instructions for real, in a fresh sandbox, and find out wha
 
 ## Problem
 
-Agent skills (`SKILL.md` / `README.md` instruction files) are increasingly AI-written, and they rot
+Picture the team that maintains **40 `SKILL.md` files for their Claude Code / Codex users** — install
+guides, deploy runbooks, SDK quickstarts. Those files are increasingly AI-written, and they rot
 silently: a package gets renamed, a CLI drops a subcommand, a step quietly needs a secret nobody
-mentioned. Nothing fails loudly — the skill just makes your agent fail later, in production.
+mentioned. Nothing fails loudly. CI does not cover them, because they are prose, not code. The team
+finds out when a user's agent confidently follows step 4 and breaks something in production.
+
+They cannot hand-run 40 instruction files every week, and reading them proves nothing — the only
+honest test is to *execute* them somewhere clean and look at the exit codes.
+
+## Why this is not AgentEval / Airlock / ChaosAgent / Code Quintet
+
+- **AgentEval** scores how well an *agent* performed a task; Skill Clinic scores the *instruction file* the agent was given.
+- **Airlock** sandboxes an agent so its actions cannot hurt you; Skill Clinic uses the sandbox as a test rig, not a containment wall.
+- **ChaosAgent** injects faults to see whether a *system* survives; Skill Clinic injects nothing — it runs the documented steps exactly as written and reports what reality returns.
+- **Code Quintet** reviews *code* with models; Skill Clinic never asks a model whether something works — the exit code decides, and a fix is only believed after it exits 0 in a **second fresh sandbox**.
 
 ## What it does
 
@@ -38,16 +50,22 @@ Every step in a report was produced by these SDK calls — nothing is simulated:
 
 | Call | Where | Why |
 |------|-------|-----|
-| `Daytona()` | `clinic/sandbox.py:72` | client from `DAYTONA_API_KEY` / `DAYTONA_TARGET` |
-| `client.create()` | `clinic/sandbox.py:78` | fresh disposable sandbox per run (~1.5-3s warm) |
-| `sandbox.fs.upload_file(archive, "skill.tar.gz")` | `clinic/sandbox.py:101` | ship the whole skill dir (`tarfile` gzip, `clinic/sandbox.py:59`) |
-| `sandbox.process.exec("bash -lc 'tar xzf ...'", timeout=120)` | `clinic/sandbox.py:102` | unpack into `/home/daytona/skill` |
-| `sandbox.process.exec(cmd, cwd=WORKDIR, timeout=...)` | `clinic/sandbox.py:121` | run one skill step; `exit_code` is the only source of truth |
-| `sandbox.delete()` | `clinic/sandbox.py:91` | in `close()`, always reached via `__exit__` / `finally` |
+| `Daytona()` | `clinic/sandbox.py:86` | client from `DAYTONA_API_KEY` / `DAYTONA_TARGET` |
+| `client.create()` | `clinic/sandbox.py:106` | fresh disposable sandbox per run (~1.5-3s warm) |
+| `sandbox.fs.upload_file(archive, "skill.tar.gz")` | `clinic/sandbox.py:134` | ship the whole skill dir (`tarfile` gzip, `clinic/sandbox.py:71`) |
+| `sandbox.process.exec("bash -lc 'tar xzf ...'", timeout=120)` | `clinic/sandbox.py:135` | unpack into `/home/daytona/skill` |
+| `sandbox.process.exec(cmd, cwd=WORKDIR, timeout=...)` | `clinic/sandbox.py:154` | run one skill step; `exit_code` is the only source of truth |
+| `sandbox.delete()` | `clinic/sandbox.py:124` | in `close()`, always reached via `__exit__` / `finally` |
 
 Sandbox A runs all steps sequentially so state persists (installs from step 1 are visible in step 4).
-Fix re-verification always uses a **new** sandbox (`verify_fix`, `clinic/sandbox.py:132`) so a fix can
+Fix re-verification always uses a **new** sandbox (`verify_fix`, `clinic/sandbox.py:195`) so a fix can
 never be credited to leftover state.
+
+A sandbox is never leaked: if the upload into a freshly created sandbox fails, `__enter__` calls
+`close()` before re-raising (`clinic/sandbox.py:__enter__`). And when the Daytona SDK or the network
+itself fails on a step, that step is recorded as **`INFRA_ERROR`**, not as a skill failure — it is
+excluded from the verdict, never shown to the judge, and reported separately as
+`infrastructure errors: N`.
 
 Field note: the default Daytona image already ships a `daytona` binary — it is the **toolbox daemon**,
 not the CLI, and invoking it exits 0. That is exactly the kind of false PASS this tool exists to expose,
@@ -55,30 +73,59 @@ so our fixture avoids it (see Limitations).
 
 ## Nosana usage
 
-The failure judge is an OpenAI-compatible chat completion against a **Nosana-hosted Ollama/vLLM
-endpoint**, configured purely by environment:
+The failure judge runs on a **credit-paid Nosana GPU job** that `nosana_deploy.py` provisions end to
+end — no wallet, no manual dashboard step:
 
-- `LLM_BASE_URL` — the Nosana job's inference endpoint (`clinic/judge.py:classify_with_llm`)
-- `LLM_MODEL` — e.g. `qwen2.5-coder:7b`
-- `LLM_API_KEY` — defaults to `"x"` for open endpoints
+```bash
+python nosana_deploy.py --template qwen3-5-9b --market nvidia-3090 --wait
+```
 
-The endpoint is provisioned by `nosana_deploy.py` (the `nosana/` module lands separately). Each report
-row records which backend judged it: `judge: "nosana:<model>"` or `judge: "rules"`. If `LLM_BASE_URL`
-is unset, the call errors, or the JSON is unparseable, Skill Clinic silently falls back to the
-deterministic regex classifier — the pipeline never hard-depends on the GPU being up.
+1. fetch the official Nosana template job definition (Ollama server + model) — `GET /api/templates/<id>`
+2. pin that job definition to **IPFS** (the public Pinata key shipped as nosana-kit's default)
+3. `POST /api/jobs/list` with the IPFS hash + market → job address + run account, **paid with account credits**
+4. poll `https://<job>.node.k8s.prd.nos.ci/api/tags` until the model server answers 200
+5. print the three variables to export:
+
+```
+export LLM_BASE_URL=https://<job>.node.k8s.prd.nos.ci/v1
+export LLM_MODEL=qwen3.5:9b
+export LLM_API_KEY=x
+```
+
+`clinic/judge.py` consumes exactly those three variables through an **OpenAI-compatible client**
+(`classify_with_llm`), so the GPU job is a drop-in judge backend. Lifecycle is managed from the same
+script: `python nosana_deploy.py --status <job>` and `python nosana_deploy.py --stop <job>`.
+
+Every report row records which backend actually judged it — `judge: "nosana:<model>"` or
+`judge: "rules"` — and the CLI prints the tally at the end (`judge backends used: nosana:qwen3.5:9b ×2,
+rules ×1`). If the LLM call fails, the CLI says so out loud (`llm judge unavailable (APIConnectionError)
+-> rules`) and falls back to the deterministic classifier; the pipeline never hard-depends on the GPU
+being up, and it never pretends the GPU judged something it did not.
 
 ## Quickstart
 
 ```bash
-python -m venv .venv && .venv/bin/pip install daytona openai requests rich pytest
-set -a; source .env; set +a        # DAYTONA_API_KEY, DAYTONA_TARGET, (optional) LLM_BASE_URL
-python clinic.py fixtures/healthy-csv-summary --no-llm
-python clinic.py fixtures/stale-daytona-quickstart --fix
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+cp .env.example .env                # then fill in DAYTONA_API_KEY (and NOSANA_API_KEY)
+set -a; source .env; set +a         # DAYTONA_API_KEY, DAYTONA_TARGET, (optional) LLM_BASE_URL
+.venv/bin/python clinic.py fixtures/healthy-csv-summary --no-llm
+.venv/bin/python clinic.py fixtures/stale-daytona-quickstart --fix
+.venv/bin/python -m pytest -q       # offline tests, no sandbox needed
 ```
 
 ```
-python clinic.py <skill-dir-or-SKILL.md> [--fix] [--timeout 180] [--max-steps 12] [--no-llm]
+clinic.py <skill-dir-or-SKILL.md> [--fix] [--timeout 180] [--max-steps 12] [--no-llm] [--out DIR]
 ```
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | verdict **HEALTHY** or **FIXABLE** |
+| `1` | verdict **ENV_SPECIFIC** or **BROKEN** — *a finding, not a crash*: the tool worked, the skill did not |
+| `2` | usage or configuration error (no runnable steps, unreadable skill path, missing/invalid `DAYTONA_API_KEY`) |
+
+A demo that ends with exit `1` is the tool succeeding at its job.
 
 ## Fixtures & expected results
 
@@ -86,6 +133,7 @@ python clinic.py <skill-dir-or-SKILL.md> [--fix] [--timeout 180] [--max-steps 12
 |---------|----------|
 | `fixtures/healthy-csv-summary` | 4/4 PASS, verdict **HEALTHY** (the control group) |
 | `fixtures/stale-daytona-quickstart` | step 3 `pip --use-feature=2020-resolver` → `stale_command` → **FIXED**; step 4 `npm install @daytonaio/daytona-sdk` → `stale_package` (scope renamed to `@daytona`) → **FIXED**; step 5 `DAYTONA_API_KEY` assert → `missing_secret`, no fix invented → **FAIL**; verdict **ENV_SPECIFIC** |
+| `fixtures/windows-only-firefox-patch` | 3/3 FAIL, all `env_specific` (powershell.exe, `/mnt/c/...`), no fix invented → verdict **ENV_SPECIFIC** |
 
 Step 2 (`npm install @daytonaio/sdk`) prints npm's deprecation notice but exits 0, so it is reported
 as PASS. We do not downgrade a step the tool itself considered successful.
@@ -98,6 +146,21 @@ as PASS. We do not downgrade a step the tool itself considered successful.
   `stale_package`, `stale_command`, `missing_secret`, `env_specific`, `network_blocked`, `bug`, `unknown`.
 - A proposed fix is only ever reported as `FIXED` after it exits 0 in a fresh sandbox.
 - `missing_secret` never gets a `fix_command` — we do not invent credentials.
+
+### Known rot rules
+
+Fix proposals come from a small **published** table of documented interface changes
+(`clinic/judge.py:_suggest_fix`) — not from anything tailored to our fixtures:
+
+| # | Rot pattern | Rewrite |
+|---|-------------|---------|
+| 1 | `daytona sandbox <verb>` | `daytona <verb>` — the noun layer was dropped from the CLI |
+| 2 | Removed pip flags | strip `--use-feature=…`, `--egg`, `--process-dependency-links` |
+| 3 | `@daytonaio/*` npm package answering 404/deprecated | `@daytona/sdk` (scope rename) |
+| 4 | An option the tool itself reports as unknown (`no such option: --x`, `unrecognized arguments: --x`) | strip that exact flag |
+
+Anything outside this table gets **no** fix — we do not guess. Every proposal still has to exit 0 in a
+fresh sandbox before it is reported as `FIXED`.
 - Verdicts: `HEALTHY` (all pass) / `FIXABLE` (every failure fixed on re-verify) /
   `ENV_SPECIFIC` (remaining failures are only secret/env/network) / `BROKEN`.
 
@@ -114,3 +177,7 @@ as PASS. We do not downgrade a step the tool itself considered successful.
 ## Team
 
 Built at the hackathon by **pineapplesour** — Daytona for execution, Nosana for the judge.
+
+## Evidence: Nosana-judged run
+
+(filled in below by the recorded run)

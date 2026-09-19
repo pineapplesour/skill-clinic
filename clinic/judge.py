@@ -54,7 +54,25 @@ _EXPLANATIONS = {
 
 
 def _suggest_fix(command: str, output: str, category: str) -> str | None:
-    """Deterministic, conservative fix suggestions."""
+    """Known rot rules: a small, published table of documented interface changes.
+
+    These are not tuned to any fixture - each row is a real, publicly documented
+    change that breaks instruction files written before it. A rule only ever
+    *proposes* a command; nothing is reported as FIXED until that command exits 0
+    in a fresh sandbox.
+
+    | # | Rot pattern                         | Rewrite                              |
+    |---|-------------------------------------|--------------------------------------|
+    | 1 | `daytona sandbox <verb>`            | `daytona <verb>` (noun layer dropped)|
+    | 2 | removed pip flags                   | strip `--use-feature=`, `--egg`,     |
+    |   |                                     | `--process-dependency-links`         |
+    | 3 | `@daytonaio/*` npm scope (404/dep.) | `@daytona/sdk`                       |
+    | 4 | option the tool itself calls unknown| strip that exact `--flag` from the   |
+    |   | ("no such option: --x")             | command                              |
+
+    Anything not in this table gets no fix - we do not guess, and we never invent
+    a credential (`missing_secret` always returns None).
+    """
     cmd = command.strip()
 
     # Daytona CLI: `daytona sandbox <verb>` was flattened to `daytona <verb>`.
