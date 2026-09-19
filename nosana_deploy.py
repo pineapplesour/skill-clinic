@@ -40,8 +40,22 @@ def _headers() -> dict:
     return {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
 
 
+def _get_json(url: str, what: str) -> dict | list:
+    """GET and decode, or exit with a readable message instead of a traceback."""
+    try:
+        r = requests.get(url, headers=_headers(), timeout=30)
+    except requests.RequestException as err:
+        sys.exit(f"{what}: could not reach {url} ({type(err).__name__}: {err})")
+    if not r.ok:
+        sys.exit(f"{what} failed {r.status_code}: {r.text[:400]}")
+    try:
+        return r.json()
+    except ValueError:
+        sys.exit(f"{what}: response was not JSON: {r.text[:200]}")
+
+
 def markets() -> list[dict]:
-    return requests.get(f"{API}/markets", headers=_headers(), timeout=30).json()
+    return _get_json(f"{API}/markets", "GET /markets")
 
 
 def market_address(slug_or_address: str) -> str:
@@ -54,7 +68,9 @@ def market_address(slug_or_address: str) -> str:
 
 
 def template_job_definition(template_id: str) -> dict:
-    t = requests.get(f"{API}/templates/{template_id}", headers=_headers(), timeout=30).json()
+    t = _get_json(f"{API}/templates/{template_id}", f"GET /templates/{template_id}")
+    if not isinstance(t, dict) or "jobDefinition" not in t:
+        sys.exit(f"template '{template_id}' has no jobDefinition (unknown template id?)")
     jd = t["jobDefinition"]
     jd.setdefault("meta", {})["trigger"] = "api"
     return jd
@@ -84,7 +100,7 @@ def post_job(ipfs_hash: str, market: str, timeout_s: int = 3600) -> dict:
 
 
 def job_status(job: str) -> dict:
-    return requests.get(f"{API}/jobs/{job}", headers=_headers(), timeout=30).json()
+    return _get_json(f"{API}/jobs/{job}", f"GET /jobs/{job}")
 
 
 def endpoint_ready(job: str) -> bool:
