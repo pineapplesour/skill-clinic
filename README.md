@@ -186,6 +186,21 @@ fresh sandbox before it is reported as `FIXED`.
 
 Built at the hackathon by **pineapplesour** — Daytona for execution, Nosana for the judge.
 
+## Evidence: third-party skills we did not write
+
+Run unmodified from their public repos (see `fixtures/third-party/*/SOURCE.txt`), each in a fresh Daytona sandbox:
+
+| Skill | Steps | Result | What the clinic found |
+|---|---|---|---|
+| `daytona/skills` — `daytona` (Daytona's own skill) | 1 bash step | HEALTHY | `pip install daytona` still resolves. Its Python blocks are not executed (they need `DAYTONA_API_KEY`, which the skill correctly tells you to set first). |
+| `anthropics/skills` — `pdf` | 4 | BROKEN, 4× `missing_tool` | `pdftotext`, `qpdf`, `pdftk`, `pdfimages` do not exist on a fresh machine; the clinic proposed `sudo apt-get install poppler-utils / qpdf / pdftk-java` and re-ran in fresh sandboxes — the tools install, but the snippets then fail because they reference example files (`input.pdf`) that the skill never creates. |
+| `anthropics/skills` — `docx` | 3 | BROKEN | Same pattern: illustrative snippets (`unzip doc.docx`, `python scripts/comment.py`) that assume files the reader has, so they cannot be executed as written. |
+
+Reports: `reports/daytona-official-*.md`, `reports/anthropic-pdf-*.md`, `reports/anthropic-docx-*.md`.
+The honest lesson these three runs teach: a lot of SKILL.md content is *illustration*, not *instruction*. A skill that
+wants to be executable should mark which blocks are runnable and ship its own fixtures — exactly what the clinic's own
+fixtures do.
+
 ## Evidence: Nosana-judged run
 
 GPU jobs provisioned today with `nosana_deploy.py` (credit-paid, via `POST /jobs/list`; all three left in the
