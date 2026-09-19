@@ -1,0 +1,101 @@
+{
+  "skill": "stale-daytona-quickstart",
+  "skill_file": "/home/pineapple/skill-clinic/fixtures/stale-daytona-quickstart/SKILL.md",
+  "generated_at": "2026-09-19T14:40:09+0900",
+  "verdict": "ENV_SPECIFIC",
+  "counts": {
+    "PASS": 3,
+    "FAIL": 1,
+    "FIXED": 2,
+    "SKIP": 0
+  },
+  "fix_mode": true,
+  "llm_judge": false,
+  "llm_model": null,
+  "steps": [
+    {
+      "index": 1,
+      "title": "1. Install the Python SDK",
+      "command": "pip install daytona",
+      "exit_code": 0,
+      "status": "PASS",
+      "category": null,
+      "explanation": null,
+      "fix_command": null,
+      "confidence": null,
+      "judge": null,
+      "seconds": 0.9,
+      "output": ".2)\nRequirement already satisfied: websockets<16.0.0,>=15.0.0 in /usr/local/lib/python3.14/site-packages (from daytona) (15.0.1)\nRequirement already satisfied: urllib3<3.0.0,>=2.1.0 in /usr/local/lib/python3.14/site-packages (from daytona-api-client==0.134.0->daytona) (2.7.0)\nRequirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.14/site-packages (from daytona-api-client==0.134.0->daytona) (2.9.0.post0)\nRequirement already satisfied: typing-extensions>=4.7.1 in /usr/local/lib/python3.14/site-packages (from daytona-api-client==0.134.0->daytona) (4.15.0)\nRequirement already satisfied: aiohttp>=3.8.4 in /usr/local/lib/python3.14/site-packages (from daytona-api-client-async==0.134.0->daytona) (3.13.5)\nRequirement already satisfied: aiohttp-retry>=2.8.3 in /usr/local/lib/python3.14/site-packages (from daytona-api-client-async==0.134.0->daytona) (2.9.1)\nRequirement already satisfied: wrapt<3,>=1.10 in /usr/local/lib/python3.14/site-packages (from Deprecated<2.0.0,>=1.2.18->daytona) (2.1.2)\nRequirement already satisfied: python-dotenv in /usr/local/lib/python3.14/site-packages (from environs<15.0.0,>=10.0.0->daytona) (1.2.2)\nRequirement already satisfied: marshmallow>=3.26.2 in /usr/local/lib/python3.14/site-packages (from environs<15.0.0,>=10.0.0->daytona) (3.26.2)\nRequirement already satisfied: anyio in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (4.13.0)\nRequirement already satisfied: certifi in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (2026.4.22)\nRequirement already satisfied: httpcore==1.* in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (1.0.9)\nRequirement already satisfied: idna in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (3.15)\nRequirement already satisfied: h11>=0.16 in /usr/local/lib/python3.14/site-packages (from httpcore==1.*->httpx<0.29.0,>=0.28.0->daytona) (0.16.0)\nRequirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.14/site-packages (from pydantic<3.0.0,>=2.4.2->daytona) (0.7.0)\nRequirement already satisfied: pydantic-core==2.46.4 in /usr/local/lib/python3.14/site-packages (from pydantic<3.0.0,>=2.4.2->daytona) (2.46.4)\nRequirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.14/site-packages (from pydantic<3.0.0,>=2.4.2->daytona) (0.4.2)\nRequirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (2.6.1)\nRequirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (1.4.0)\nRequirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (26.1.0)\nRequirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (1.8.0)\nRequirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (6.7.1)\nRequirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (0.5.2)\nRequirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (1.23.0)\nRequirement already satisfied: packaging>=17.0 in /usr/local/lib/python3.14/site-packages (from marshmallow>=3.26.2->environs<15.0.0,>=10.0.0->daytona) (25.0)\nRequirement already satisfied: six>=1.5 in /usr/local/lib/python3.14/site-packages (from python-dateutil>=2.8.2->daytona-api-client==0.134.0->daytona) (1.17.0)\n\n[notice] A new release of pip is available: 26.0.1 -> 26.2.1\n[notice] To update, run: pip install --upgrade pip\n"
+    },
+    {
+      "index": 2,
+      "title": "2. Install the Node SDK",
+      "command": "npm install @daytonaio/sdk",
+      "exit_code": 0,
+      "status": "PASS",
+      "category": null,
+      "explanation": null,
+      "fix_command": null,
+      "confidence": null,
+      "judge": null,
+      "seconds": 14.6,
+      "output": "npm warn deprecated @daytonaio/sdk@0.214.0: Moved to @daytona/sdk, same API, no breaking changes. Please update: npm uninstall @daytonaio/sdk && npm i @daytona/sdk\n\nadded 179 packages in 16s\n\n17 packages are looking for funding\n  run `npm fund` for details\nnpm notice\nnpm notice New minor version of npm available! 11.12.1 -> 11.19.1\nnpm notice Changelog: https://github.com/npm/cli/releases/tag/v11.19.1\nnpm notice To update run: npm install -g npm@11.19.1\nnpm notice\n"
+    },
+    {
+      "index": 3,
+      "title": "3. Pin the resolver",
+      "command": "pip install --use-feature=2020-resolver daytona",
+      "exit_code": 2,
+      "status": "FIXED",
+      "category": "stale_command",
+      "explanation": "The CLI no longer accepts this subcommand/flag; the skill was written against an older version.",
+      "fix_command": "pip install daytona",
+      "confidence": 0.8,
+      "judge": "rules",
+      "seconds": 1.4,
+      "output": "\n[optparse.groups]Usage:[/]   \n  pip install \\[options] <requirement specifier> \\[package-index-options] ...\n  pip install \\[options] -r <requirements file> \\[package-index-options] ...\n  pip install \\[options] [-e] <vcs project url> ...\n  pip install \\[options] [-e] <local project path> ...\n  pip install \\[options] <archive url/path> ...\n\noption --use-feature: invalid choice: '2020-resolver' (choose from 'fast-deps', 'build-constraint', 'inprocess-build-deps', 'truststore', 'no-binary-enable-wheel-cache')\n"
+    },
+    {
+      "index": 4,
+      "title": "4. Add the legacy Node package",
+      "command": "npm install @daytonaio/daytona-sdk",
+      "exit_code": 1,
+      "status": "FIXED",
+      "category": "stale_package",
+      "explanation": "The package or version referenced by the skill no longer resolves on the registry.",
+      "fix_command": "npm install @daytona/sdk",
+      "confidence": 0.8,
+      "judge": "rules",
+      "seconds": 1.9,
+      "output": "npm error code E404\nnpm error 404 Not Found - GET https://registry.npmjs.org/@daytonaio%2fdaytona-sdk - Not found\nnpm error 404\nnpm error 404  The requested resource '@daytonaio/daytona-sdk@*' could not be found or you do not have permission to access it.\nnpm error 404\nnpm error 404 Note that you can also install from a\nnpm error 404 tarball, folder, http url, or git url.\nnpm error A complete log of this run can be found in: /home/daytona/.npm/_logs/2026-09-19T05_39_26_119Z-debug-0.log\n"
+    },
+    {
+      "index": 5,
+      "title": "5. Check your credentials",
+      "command": "python -c \"import os; assert os.environ.get('DAYTONA_API_KEY'), 'Set the DAYTONA_API_KEY environment variable'\"",
+      "exit_code": 1,
+      "status": "FAIL",
+      "category": "missing_secret",
+      "explanation": "The step needs a credential or environment variable that the skill never tells you to set.",
+      "fix_command": null,
+      "confidence": 0.8,
+      "judge": "rules",
+      "seconds": 0.3,
+      "output": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    import os; assert os.environ.get('DAYTONA_API_KEY'), 'Set the DAYTONA_API_KEY environment variable'\n                      ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\nAssertionError: Set the DAYTONA_API_KEY environment variable\n"
+    },
+    {
+      "index": 6,
+      "title": "6. Verify the SDK imports",
+      "command": "python -c \"from daytona import Daytona; print('daytona sdk ready')\"",
+      "exit_code": 0,
+      "status": "PASS",
+      "category": null,
+      "explanation": null,
+      "fix_command": null,
+      "confidence": null,
+      "judge": null,
+      "seconds": 4.5,
+      "output": "daytona sdk ready\n"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "skill": "windows-only-firefox-patch",
+  "skill_file": "/home/pineapple/skill-clinic/fixtures/windows-only-firefox-patch/SKILL.md",
+  "generated_at": "2026-09-19T14:37:50+0900",
+  "verdict": "ENV_SPECIFIC",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 3,
+    "FIXED": 0,
+    "SKIP": 0
+  },
+  "fix_mode": false,
+  "llm_judge": false,
+  "llm_model": null,
+  "steps": [
+    {
+      "index": 1,
+      "title": "1. Locate the Firefox install",
+      "command": "powershell.exe -NoProfile -Command \"Get-Item 'C:\\Program Files\\Mozilla Firefox\\firefox.exe' | Select-Object -ExpandProperty VersionInfo | Select-Object ProductVersion\"",
+      "exit_code": 127,
+      "status": "FAIL",
+      "category": "env_specific",
+      "explanation": "The step assumes a specific host OS, shell or privilege level.",
+      "fix_command": null,
+      "confidence": 0.9,
+      "judge": "rules",
+      "seconds": 0.3,
+      "output": "bash: line 1: powershell.exe: command not found\n"
+    },
+    {
+      "index": 2,
+      "title": "2. Check the installed patch package",
+      "command": "ls -la /mnt/c/Users/$USER/AppData/Local/FirefoxShiftEnterPatch/\nsha256sum /mnt/c/Users/$USER/AppData/Local/FirefoxShiftEnterPatch/autoconfig.js",
+      "exit_code": 1,
+      "status": "FAIL",
+      "category": "env_specific",
+      "explanation": "The step assumes a specific host OS, shell or privilege level.",
+      "fix_command": null,
+      "confidence": 0.9,
+      "judge": "rules",
+      "seconds": 0.3,
+      "output": "ls: cannot access '/mnt/c/Users//AppData/Local/FirefoxShiftEnterPatch/': No such file or directory\nsha256sum: /mnt/c/Users//AppData/Local/FirefoxShiftEnterPatch/autoconfig.js: No such file or directory\n"
+    },
+    {
+      "index": 3,
+      "title": "3. Verify the AutoConfig files are in place",
+      "command": "test -f \"/mnt/c/Program Files/Mozilla Firefox/defaults/pref/autoconfig.js\" && echo \"autoconfig loader present\"\ntest -f \"/mnt/c/Program Files/Mozilla Firefox/firefox.cfg\" && echo \"firefox.cfg present\"",
+      "exit_code": 1,
+      "status": "FAIL",
+      "category": "env_specific",
+      "explanation": "The step assumes a specific host OS, shell or privilege level.",
+      "fix_command": null,
+      "confidence": 0.9,
+      "judge": "rules",
+      "seconds": 0.2,
+      "output": ""
+    }
+  ]
+}
