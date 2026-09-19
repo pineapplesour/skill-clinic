@@ -260,17 +260,17 @@
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 20px;
-      height: 72%;
+      gap: 16px;
+      height: 80%;
     }
 
     .bento-card {
       background: white;
       border-radius: 28px;
-      padding: 22px 28px;
+      padding: 16px 22px;
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 14px;
       border: 3.5px solid transparent;
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.02);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -282,13 +282,13 @@
     .card-purple { border-color: var(--accent-purple); }
 
     .icon-badge {
-      width: 58px;
-      height: 58px;
+      width: 48px;
+      height: 48px;
       border-radius: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 24px;
       flex-shrink: 0;
     }
 
@@ -312,12 +312,12 @@
 
     .card-content h3 {
       font-family: var(--font-title);
-      font-size: 20px;
+      font-size: 18px;
       color: #333;
     }
 
     .card-content p {
-      font-size: 13.5px;
+      font-size: 12.5px;
       color: #777;
       font-weight: 500;
       line-height: 1.35;
@@ -329,14 +329,14 @@
     .bento-3col {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      height: 72%;
+      gap: 18px;
+      height: 80%;
     }
 
     .col-card {
       background: white;
       border-radius: 28px;
-      padding: 30px 24px;
+      padding: 22px 20px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -346,10 +346,10 @@
     }
 
     .col-card .icon-badge {
-      margin-bottom: 16px;
-      width: 64px;
-      height: 64px;
-      font-size: 32px;
+      margin-bottom: 10px;
+      width: 52px;
+      height: 52px;
+      font-size: 26px;
     }
 
     .col-card h3 {
@@ -360,16 +360,16 @@
     }
 
     .col-card p {
-      font-size: 14px;
+      font-size: 13px;
       color: #666;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     .col-tag {
       margin-top: auto;
       font-family: var(--font-num);
       font-weight: 900;
-      font-size: 12px;
+      font-size: 11px;
       padding: 6px 14px;
       border-radius: 999px;
       background: #f4f6fa;
@@ -382,15 +382,15 @@
     .split-grid {
       display: grid;
       grid-template-columns: 1.1fr 1fr;
-      gap: 24px;
-      height: 72%;
+      gap: 20px;
+      height: 80%;
     }
 
     .highlight-card {
       background: #FFF4E0;
       border: 3.5px dashed var(--accent-orange);
       border-radius: 30px;
-      padding: 36px;
+      padding: 28px 30px;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -412,30 +412,33 @@
     }
 
     .highlight-card p {
-      font-size: 15px;
+      font-size: 13.5px;
       color: #666;
-      line-height: 1.5;
+      line-height: 1.45;
     }
 
     .detail-list {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       justify-content: center;
     }
 
     .detail-item {
       background: white;
       border-radius: 24px;
-      padding: 20px 24px;
+      padding: 12px 18px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       border-left: 6px solid var(--accent-pink);
       box-shadow: 0 8px 16px rgba(0,0,0,0.02);
     }
 
     .detail-item:nth-child(2) { border-left-color: var(--accent-blue); }
+    .detail-item .icon-badge { width: 40px; height: 40px; font-size: 20px; border-radius: 14px; }
+    .detail-item h4 { font-family: var(--font-title); font-size: 15.5px; color:#333; }
+    .detail-item p { font-size: 12px; color:#777; line-height:1.4; }
 
     /* ----------------------------------------------------
        슬라이드 5: 4단계 프로세스 로드맵 (TIMELINE)
@@ -443,15 +446,16 @@
     .timeline-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 16px;
-      height: 72%;
-      align-items: center;
+      gap: 14px;
+      height: auto;
+      margin: auto 0;
+      align-items: stretch;
     }
 
     .timeline-step {
       background: white;
       border-radius: 26px;
-      padding: 26px 20px;
+      padding: 18px 13px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -459,8 +463,9 @@
       position: relative;
       border: 3px solid transparent;
       box-shadow: 0 10px 20px rgba(0,0,0,0.02);
-      height: 90%;
-      justify-content: space-between;
+      height: auto;
+      justify-content: flex-start;
+      gap: 8px;
     }
 
     .timeline-step .step-badge {
@@ -473,14 +478,16 @@
       border-radius: 999px;
     }
 
+    .timeline-step .icon-badge { width: 44px; height: 44px; font-size: 22px; }
+
     .timeline-step h3 {
       font-family: var(--font-title);
-      font-size: 19px;
+      font-size: 17px;
       color: #333;
     }
 
     .timeline-step p {
-      font-size: 13px;
+      font-size: 11.5px;
       color: #777;
       line-height: 1.4;
     }
@@ -564,6 +571,14 @@
     .m-blue{background:#E2F3F5;color:#1c6b7a} .m-pink{background:#FFE5E0;color:#c2415f} .m-green{background:#E9FCE2;color:#2f7a2f} .m-purple{background:#F3EAF8;color:#6b4a86}
     .slide-foot { position:absolute; left:60px; right:60px; bottom:26px; display:flex; justify-content:space-between; font-family: var(--font-num); font-weight:800; font-size:12px; color:#b9a98f; }
     .stat-number.sm { font-size:52px; }
+
+    /* 한/영 병기 */
+    .en { display:block; font-size:0.78em; color:#8a8a8a; font-weight:500; margin-top:2px; font-family: var(--font-body); line-height:1.3; }
+    .tag .en, .slide-foot .en { display:inline; margin-left:6px; font-size:0.92em; }
+    .cover-title .en { font-size:20px; margin-top:10px; }
+    .outro-title .en { font-size:19px; margin-top:8px; }
+    .slide-header h2 .en { font-size:17px; }
+    .cover-desc .en { font-size:14px; }
 </style>
 </head>
 <body>
@@ -585,11 +600,11 @@
     <div class="slide-wrapper cover-slide active">
       <div class="cover-content">
         <span class="cover-tag">DAYTONA HACKSPRINT SEOUL · 2026.09.19</span>
-        <h1 class="cover-title">Skill Clinic<br><span>에이전트 스킬, 읽지 말고 돌려서 검진한다</span></h1>
-        <p class="cover-desc">AI가 쓴 SKILL.md를 새 컴퓨터에서 실제로 실행하고, 실패를 분류하고, 수정안을 또 다른 새 컴퓨터에서 재검증하는 도구</p>
+        <h1 class="cover-title">Skill Clinic<br><span>에이전트 스킬, 읽지 말고 돌려서 검진한다</span><span class="en">Agent skills: don't read them — run them and diagnose</span></h1>
+        <p class="cover-desc">AI가 쓴 SKILL.md를 새 컴퓨터에서 실제로 실행하고, 실패를 분류하고, 수정안을 또 다른 새 컴퓨터에서 재검증하는 도구<span class="en">Runs AI-written SKILL.md on a fresh machine, classifies the failures, and re-verifies fixes on another fresh machine</span></p>
         <div class="cover-footer">
-          <div class="capsule-badge">Daytona 샌드박스 · 필수 경로</div>
-          <div class="capsule-badge">Nosana GPU · 싼 판정 모델</div>
+          <div class="capsule-badge">Daytona 샌드박스 · 필수 경로<span class="en">Daytona sandbox · core path</span></div>
+          <div class="capsule-badge">Nosana GPU · 싼 판정 모델<span class="en">Nosana GPU · cheap judge model</span></div>
           <div class="capsule-badge">Team pineapplesour</div>
         </div>
       </div>
@@ -600,39 +615,39 @@
       <div class="page-index">02</div>
       <div class="slide-header">
         <span class="tag">PROBLEM</span>
-        <h2>스킬은 AI가 쓰고, 조용히 썩는다</h2>
+        <h2>스킬은 AI가 쓰고, 조용히 썩는다<span class="en">Skills are written by AI — and quietly rot</span></h2>
       </div>
       <div class="bento-grid">
         <div class="bento-card card-pink">
           <div class="icon-badge">1</div>
           <div class="card-content">
             <span class="step-num">WHO</span>
-            <h3>Claude Code · Codex · Cursor 사용자</h3>
-            <p>skills 40개를 유지하는 팀. 스킬 대부분을 에이전트가 썼고, 사람은 읽어보고 넘김</p>
+            <h3>Claude Code · Codex · Cursor 사용자<span class="en">Claude Code · Codex · Cursor users</span></h3>
+            <p>스킬 40개를 굴리는 팀. 대부분 에이전트가 썼고 사람은 읽고 넘김<span class="en">Teams run 40 skills. Agents wrote most; humans only skim.</span></p>
           </div>
         </div>
         <div class="bento-card card-blue">
           <div class="icon-badge">2</div>
           <div class="card-content">
             <span class="step-num">TODAY</span>
-            <h3>오늘 아침 실제 사례</h3>
-            <p>에이전트가 <code class="k">@daytonaio/sdk</code> 설치를 지시. 그 패키지는 <code class="k">@daytona/sdk</code>로 이사한 지 오래</p>
+            <h3>오늘 아침 실제 사례<span class="en">A real case, this morning</span></h3>
+            <p>에이전트가 <code class="k">@daytonaio/sdk</code> 설치를 지시. 실제론 <code class="k">@daytona/sdk</code>로 이사한 지 오래<span class="en">An agent told us to install @daytonaio/sdk; it moved to @daytona/sdk long ago.</span></p>
           </div>
         </div>
         <div class="bento-card card-green">
           <div class="icon-badge">3</div>
           <div class="card-content">
             <span class="step-num">GAP</span>
-            <h3>스킬 생태계에 CI가 없다</h3>
-            <p>npx skills add, 플러그인 마켓, daytona/skills. 정적 점검 도구는 읽기만 한다</p>
+            <h3>스킬 생태계에 CI가 없다<span class="en">The skill ecosystem has no CI</span></h3>
+            <p>npx skills add, 플러그인 마켓, daytona/skills. 정적 점검 도구는 읽기만 한다<span class="en">npx skills add, plugin markets, daytona/skills — static checkers only read.</span></p>
           </div>
         </div>
         <div class="bento-card card-purple">
           <div class="icon-badge">4</div>
           <div class="card-content">
             <span class="step-num">SECURITY</span>
-            <h3>숨은 프롬프트 인젝션은 읽어선 못 잡는다</h3>
-            <p>스킬 안에 <code class="k">curl … | sh</code>, 키 유출 시도가 숨어 들어옴. 새 컴퓨터에서 실제로 돌려보면 무슨 짓을 하려 했는지 드러남</p>
+            <h3>인젝션은 읽어선 못 잡는다<span class="en">Reading can't catch injection</span></h3>
+            <p>스킬 안에 <code class="k">curl … | sh</code>, 키 유출이 숨음. 새 컴퓨터에서 돌려야 드러남<span class="en">Skills hide curl … | sh and key exfil; only a real run on a fresh box exposes it.</span></p>
           </div>
         </div>
       </div>
@@ -644,64 +659,64 @@
       <div class="page-index">03</div>
       <div class="slide-header">
         <span class="tag">HOW IT WORKS</span>
-        <h2>새 컴퓨터에서 실행 → 싼 모델이 분류 → 새 컴퓨터에서 재검증</h2>
+        <h2>새 컴퓨터에서 실행 → 싼 모델이 분류 → 새 컴퓨터에서 재검증<span class="en">Run on a fresh machine → a cheap model classifies → re-verify on a fresh machine</span></h2>
       </div>
       <div class="bento-3col">
         <div class="col-card card-blue">
           <div class="icon-badge">D</div>
-          <h3>Daytona: 실행</h3>
-          <p>SKILL.md의 코드블록을 순서대로 뽑아 <b>새 샌드박스</b>에 올리고 실행. exit code와 로그만 수집. 끝나면 삭제</p>
+          <h3>Daytona: 실행<span class="en">Daytona: run</span></h3>
+          <p>SKILL.md의 코드블록을 순서대로 뽑아 <b>새 샌드박스</b>에서 실행. exit code와 로그만 수집, 끝나면 삭제<span class="en">Pulls SKILL.md code blocks in order, runs them in a fresh sandbox, keeps only exit codes and logs, then deletes it.</span></p>
           <span class="col-tag">create · upload · exec · delete</span>
         </div>
         <div class="col-card card-pink">
           <div class="icon-badge">N</div>
-          <h3>Nosana: 분류</h3>
-          <p>실패한 단계만 Nosana GPU의 오픈모델(Qwen)이 분류. stale_package · stale_command · missing_tool · missing_secret · env_specific · example_snippet · bug</p>
-          <span class="col-tag">/jobs/list 크레딧 잡 → OpenAI 호환 엔드포인트</span>
+          <h3>Nosana: 분류<span class="en">Nosana: classify</span></h3>
+          <p>실패한 단계만 Nosana GPU의 오픈모델(Qwen)이 분류. stale_package · stale_command · missing_tool · missing_secret · env_specific · example_snippet · bug<span class="en">Only failed steps go to an open model (Qwen) on Nosana GPUs for labeling.</span></p>
+          <span class="col-tag">inference.nosana.com/v1 · OpenAI-compatible</span>
         </div>
         <div class="col-card card-green">
           <div class="icon-badge">✓</div>
-          <h3>재검증: 영수증</h3>
-          <p>수정안을 <b>또 다른 새 샌드박스</b>에서 재실행. exit 0일 때만 FIXED. 결과는 .md / .json / .html 영수증</p>
+          <h3>재검증: 영수증<span class="en">Re-verify: receipts</span></h3>
+          <p>수정안을 <b>또 다른 새 샌드박스</b>에서 재실행. exit 0일 때만 FIXED. 결과는 .md / .json / .html 영수증<span class="en">Fixes re-run in another fresh sandbox. FIXED only on exit 0. Receipts in .md / .json / .html.</span></p>
           <span class="col-tag">HEALTHY · FIXABLE · ENV_SPECIFIC · BROKEN</span>
         </div>
       </div>
-      <div class="slide-foot"><span>규칙: pass/fail은 exit code가 정한다. 모델은 분류와 수정 제안만</span><span>안전: 미신뢰 지시라도 전부 샌드박스 안</span></div>
+      <div class="slide-foot"><span>규칙: pass/fail은 exit code가 정한다. 모델은 분류와 수정 제안만<span class="en">Rule: exit codes decide pass/fail; the model only classifies and proposes.</span></span><span>안전: 미신뢰 지시는 전부 샌드박스 안<span class="en">Safety: untrusted steps stay in the sandbox.</span></span></div>
     </div>
 
     <!-- [4] 실제 결과 -->
     <div class="slide-wrapper">
       <div class="page-index">04</div>
       <div class="slide-header">
-        <span class="tag">EVIDENCE · 오늘, 진짜 샌드박스</span>
-        <h2>남이 쓴 스킬 3개를 무수정으로 돌렸다</h2>
+        <span class="tag">EVIDENCE · 오늘, 진짜 샌드박스<span class="en">· REAL SANDBOX, TODAY</span></span>
+        <h2>남이 쓴 스킬 3개를 무수정으로 돌렸다<span class="en">We ran three third-party skills unmodified</span></h2>
       </div>
       <div class="split-grid">
         <div class="highlight-card">
           <div class="stat-number sm">4 / 4</div>
-          <h3>Anthropic 공식 pdf 스킬: 단계 4개 전부 missing_tool</h3>
-          <p>pdftotext · qpdf · pdftk · pdfimages가 새 컴퓨터엔 없음. 클리닉이 <code class="k">apt-get install</code>을 제안하고 새 샌드박스에서 재실행. 도구는 깔리지만 예시 파일(input.pdf)이 없어 <b>example_snippet</b>으로 재분류. 즉 "설명용 스니펫"이지 "실행 가능한 지시"가 아님</p>
+          <h3>Anthropic 공식 pdf 스킬: 단계 4개 전부 missing_tool<span class="en">Anthropic's official pdf skill: all 4 steps missing_tool</span></h3>
+          <p>pdftotext · qpdf · pdftk가 새 컴퓨터엔 없음. <code class="k">apt-get install</code> 제안 후 재실행하니 도구는 깔렸지만 예시 파일이 없어 <b>example_snippet</b>으로 재분류 — 실행 지시가 아니라 설명용 스니펫<span class="en">The tools are absent on a fresh box. After an apt-get fix and a re-run they install, but the sample file is missing, so it is reclassified example_snippet: illustration, not a runnable instruction.</span></p>
         </div>
         <div class="detail-list">
           <div class="detail-item">
             <div class="icon-badge" style="background:#E2F3F5;">✓</div>
             <div>
-              <h4 style="font-family: var(--font-title); font-size: 18px; margin-bottom: 4px;">stale 픽스처: FIXED 2, missing_secret 1</h4>
-              <p style="font-size: 13px; color: #777;"><code class="k">@daytonaio/*</code> 404 → <code class="k">@daytona/sdk</code>로 고쳐 재검증 초록. 죽은 pip 플래그 제거. 키는 지어내지 않음</p>
+              <h4>stale 픽스처: FIXED 2, missing_secret 1<span class="en">Stale fixture: 2 FIXED, 1 missing_secret</span></h4>
+              <p><code class="k">@daytonaio/*</code> 404 → <code class="k">@daytona/sdk</code>로 고쳐 재검증 초록. 키는 지어내지 않음<span class="en">404 fixed to @daytona/sdk and re-verified green; no secrets invented.</span></p>
             </div>
           </div>
           <div class="detail-item">
             <div class="icon-badge" style="background:#E9FCE2;">✓</div>
             <div>
-              <h4 style="font-family: var(--font-title); font-size: 18px; margin-bottom: 4px;">Daytona 공식 스킬: HEALTHY</h4>
-              <p style="font-size: 13px; color: #777;">daytona/skills의 SKILL.md는 통과. 도구가 "다 깨졌다"고 우기는 물건이 아님</p>
+              <h4>Daytona 공식 스킬: HEALTHY<span class="en">Daytona's official skill: HEALTHY</span></h4>
+              <p>daytona/skills의 SKILL.md는 통과. 다 깨졌다고 우기는 도구가 아님<span class="en">It passes — the tool does not just cry "broken" at everything.</span></p>
             </div>
           </div>
           <div class="detail-item">
             <div class="icon-badge" style="background:#F3EAF8;">!</div>
             <div>
-              <h4 style="font-family: var(--font-title); font-size: 18px; margin-bottom: 4px;">덤: 샌드박스의 daytona 바이너리는 툴박스 데몬</h4>
-              <p style="font-size: 13px; color: #777;">옛 명령 <code class="k">daytona sandbox create</code>가 조용히 exit 0. 이런 게 스킬 부패</p>
+              <h4>덤: 샌드박스의 daytona 바이너리는 툴박스 데몬<span class="en">Bonus: the in-sandbox daytona binary is the toolbox daemon</span></h4>
+              <p>옛 명령 <code class="k">daytona sandbox create</code>가 조용히 exit 0<span class="en">The old command silently exits 0 — that is skill rot.</span></p>
             </div>
           </div>
         </div>
@@ -713,32 +728,32 @@
       <div class="page-index">05</div>
       <div class="slide-header">
         <span class="tag">SPONSORS · RULES · NEXT</span>
-        <h2>왜 Daytona가 필수이고, Nosana가 맞는가</h2>
+        <h2>왜 Daytona가 필수이고, Nosana가 맞는가<span class="en">Why Daytona is required and Nosana is the right fit</span></h2>
       </div>
       <div class="timeline-grid">
         <div class="timeline-step card-blue">
           <span class="step-badge">DAYTONA</span>
           <div class="icon-badge">D</div>
-          <h3>스킬당 새 컴퓨터</h3>
-          <p>미신뢰 지시를 안전하게 실행하고 행동을 관찰. 외부망이 막힌 샌드박스라 유출 시도는 실패로 기록됨. 샌드박스 없이는 성립 안 함</p>
+          <h3>스킬당 새 컴퓨터<span class="en">A fresh machine per skill</span></h3>
+          <p>미신뢰 지시를 안전하게 실행하고 관찰. 외부망 차단이라 유출 시도는 실패로 기록<span class="en">Runs untrusted steps safely; egress is blocked, so exfil logs as failure.</span></p>
         </div>
         <div class="timeline-step card-pink">
           <span class="step-badge">NOSANA</span>
           <div class="icon-badge">N</div>
-          <h3>싼 모델로 충분</h3>
-          <p>검증은 지능이 아니라 실행. 분류·수정안은 3090급 오픈모델이면 됨. 오늘 잡 4개 포스트, 주소는 README에 공개</p>
+          <h3>싼 모델로 충분<span class="en">A cheap model is enough</span></h3>
+          <p>검증은 지능이 아니라 실행. 판정 런 기록: Nosana 호스티드 추론 qwen3.8-27b, 실패 3단계 분류<span class="en">Verification is execution, not intelligence. Recorded run: Nosana hosted inference (qwen3.8-27b) classified all 3 failures.</span></p>
         </div>
         <div class="timeline-step card-green">
           <span class="step-badge">HONESTY</span>
           <div class="icon-badge">✓</div>
-          <h3>모델은 판정 못 함</h3>
-          <p>pass/fail은 exit code. 시크릿은 지어내지 않음. 인프라 오류는 스킬 탓으로 안 넘김</p>
+          <h3>모델은 판정 못 함<span class="en">The model never decides pass/fail</span></h3>
+          <p>pass/fail은 exit code. 시크릿은 지어내지 않고, 인프라 오류는 스킬 탓으로 안 넘김<span class="en">Exit codes decide. No invented secrets; infra errors are not blamed on the skill.</span></p>
         </div>
         <div class="timeline-step card-purple">
           <span class="step-badge">NEXT</span>
           <div class="icon-badge">▶</div>
-          <h3>매트릭스 · PR · 배지</h3>
-          <p>배포판×런타임 스냅샷 팬아웃, 자동 PR, skills 레지스트리용 검진 배지</p>
+          <h3>매트릭스 · PR · 배지<span class="en">Matrix · PRs · badges</span></h3>
+          <p>배포판×런타임 팬아웃, 자동 PR, skills 레지스트리용 검진 배지<span class="en">Distro × runtime fan-out, automatic PRs, a clinic badge for skill registries.</span></p>
         </div>
       </div>
     </div>
@@ -747,11 +762,11 @@
     <div class="slide-wrapper outro-slide">
       <div class="page-index">06</div>
       <div class="icon-badge" style="width: 80px; height: 80px; font-size: 40px; background:#FFE29A;">✓</div>
-      <h2 class="outro-title">스킬은 <span>돌려봐야</span> 안다</h2>
-      <p style="color: #777; font-size: 16px;">python clinic.py &lt;skill-dir&gt; --fix &nbsp;·&nbsp; 한 번 실행에 영수증 세 장(.md .json .html)</p>
+      <h2 class="outro-title">스킬은 <span>돌려봐야</span> 안다<span class="en">You only know a skill by running it</span></h2>
+      <p style="color: #777; font-size: 16px;">python clinic.py &lt;skill-dir&gt; --fix &nbsp;·&nbsp; 한 번 실행에 영수증 세 장(.md .json .html)<span class="en" style="font-size:13px;">One run, three receipts (.md .json .html)</span></p>
       <div class="outro-card">
         <div class="contact-item"><span>▶</span><span>github.com/pineapplesour/skill-clinic</span></div>
-        <div class="contact-item"><span>●</span><span>Daytona SDK + Nosana API, 실제 실행 리포트 동봉</span></div>
+        <div class="contact-item"><span>●</span><span>Daytona SDK + Nosana API, 실제 실행 리포트 동봉<span class="en">Daytona SDK + Nosana API, real run reports included</span></span></div>
       </div>
     </div>
 
