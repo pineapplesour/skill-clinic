@@ -1,13 +1,12 @@
 {
   "skill": "daytona-official",
   "skill_file": "/home/pineapple/skill-clinic/fixtures/third-party/daytona-official/SKILL.md",
-  "generated_at": "2026-09-19T14:53:06+0900",
+  "generated_at": "2026-09-19T15:08:43+0900",
   "verdict": "HEALTHY",
   "counts": {
     "PASS": 1,
     "FAIL": 0,
     "FIXED": 0,
-    "SKIP": 0,
     "INFRA_ERROR": 0
   },
   "fix_mode": true,
@@ -25,7 +24,8 @@
       "fix_command": null,
       "confidence": null,
       "judge": null,
-      "seconds": 1.1,
+      "after_fix": null,
+      "seconds": 1.0,
       "output": ".2)\nRequirement already satisfied: websockets<16.0.0,>=15.0.0 in /usr/local/lib/python3.14/site-packages (from daytona) (15.0.1)\nRequirement already satisfied: urllib3<3.0.0,>=2.1.0 in /usr/local/lib/python3.14/site-packages (from daytona-api-client==0.134.0->daytona) (2.7.0)\nRequirement already satisfied: python-dateutil>=2.8.2 in /usr/local/lib/python3.14/site-packages (from daytona-api-client==0.134.0->daytona) (2.9.0.post0)\nRequirement already satisfied: typing-extensions>=4.7.1 in /usr/local/lib/python3.14/site-packages (from daytona-api-client==0.134.0->daytona) (4.15.0)\nRequirement already satisfied: aiohttp>=3.8.4 in /usr/local/lib/python3.14/site-packages (from daytona-api-client-async==0.134.0->daytona) (3.13.5)\nRequirement already satisfied: aiohttp-retry>=2.8.3 in /usr/local/lib/python3.14/site-packages (from daytona-api-client-async==0.134.0->daytona) (2.9.1)\nRequirement already satisfied: wrapt<3,>=1.10 in /usr/local/lib/python3.14/site-packages (from Deprecated<2.0.0,>=1.2.18->daytona) (2.1.2)\nRequirement already satisfied: python-dotenv in /usr/local/lib/python3.14/site-packages (from environs<15.0.0,>=10.0.0->daytona) (1.2.2)\nRequirement already satisfied: marshmallow>=3.26.2 in /usr/local/lib/python3.14/site-packages (from environs<15.0.0,>=10.0.0->daytona) (3.26.2)\nRequirement already satisfied: anyio in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (4.13.0)\nRequirement already satisfied: certifi in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (2026.4.22)\nRequirement already satisfied: httpcore==1.* in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (1.0.9)\nRequirement already satisfied: idna in /usr/local/lib/python3.14/site-packages (from httpx<0.29.0,>=0.28.0->daytona) (3.15)\nRequirement already satisfied: h11>=0.16 in /usr/local/lib/python3.14/site-packages (from httpcore==1.*->httpx<0.29.0,>=0.28.0->daytona) (0.16.0)\nRequirement already satisfied: annotated-types>=0.6.0 in /usr/local/lib/python3.14/site-packages (from pydantic<3.0.0,>=2.4.2->daytona) (0.7.0)\nRequirement already satisfied: pydantic-core==2.46.4 in /usr/local/lib/python3.14/site-packages (from pydantic<3.0.0,>=2.4.2->daytona) (2.46.4)\nRequirement already satisfied: typing-inspection>=0.4.2 in /usr/local/lib/python3.14/site-packages (from pydantic<3.0.0,>=2.4.2->daytona) (0.4.2)\nRequirement already satisfied: aiohappyeyeballs>=2.5.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (2.6.1)\nRequirement already satisfied: aiosignal>=1.4.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (1.4.0)\nRequirement already satisfied: attrs>=17.3.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (26.1.0)\nRequirement already satisfied: frozenlist>=1.1.1 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (1.8.0)\nRequirement already satisfied: multidict<7.0,>=4.5 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (6.7.1)\nRequirement already satisfied: propcache>=0.2.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (0.5.2)\nRequirement already satisfied: yarl<2.0,>=1.17.0 in /usr/local/lib/python3.14/site-packages (from aiohttp>=3.8.4->daytona-api-client-async==0.134.0->daytona) (1.23.0)\nRequirement already satisfied: packaging>=17.0 in /usr/local/lib/python3.14/site-packages (from marshmallow>=3.26.2->environs<15.0.0,>=10.0.0->daytona) (25.0)\nRequirement already satisfied: six>=1.5 in /usr/local/lib/python3.14/site-packages (from python-dateutil>=2.8.2->daytona-api-client==0.134.0->daytona) (1.17.0)\n\n[notice] A new release of pip is available: 26.0.1 -> 26.2.1\n[notice] To update, run: pip install --upgrade pip\n"
     }
   ]

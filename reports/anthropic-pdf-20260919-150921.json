@@ -1,7 +1,7 @@
 {
   "skill": "anthropic-pdf",
   "skill_file": "/home/pineapple/skill-clinic/fixtures/third-party/anthropic-pdf/SKILL.md",
-  "generated_at": "2026-09-19T14:55:27+0900",
+  "generated_at": "2026-09-19T15:09:21+0900",
   "verdict": "BROKEN",
   "counts": {
     "PASS": 0,
@@ -24,7 +24,11 @@
       "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 && pdftotext input.pdf output.txt\npdftotext -layout input.pdf output.txt\npdftotext -f 1 -l 5 input.pdf output.txt  # Pages 1-5",
       "confidence": 0.85,
       "judge": "rules",
-      "seconds": 4.8,
+      "after_fix": {
+        "category": "example_snippet",
+        "explanation": "The step references example input files that do not exist - it is an illustrative snippet, not a runnable instruction."
+      },
+      "seconds": 3.3,
       "output": "bash: line 1: pdftotext: command not found\nbash: line 2: pdftotext: command not found\nbash: line 3: pdftotext: command not found\n\n\n[clinic] fix attempt output:\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\n"
     },
     {
@@ -38,7 +42,11 @@
       "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq qpdf >/dev/null 2>&1 && qpdf --empty --pages file1.pdf file2.pdf -- merged.pdf\nqpdf input.pdf --pages . 1-5 -- pages1-5.pdf\nqpdf input.pdf --pages . 6-10 -- pages6-10.pdf\nqpdf input.pdf output.pdf --rotate=+90:1  # Rotate page 1 by 90 degrees\nqpdf --password=mypassword --decrypt encrypted.pdf decrypted.pdf",
       "confidence": 0.85,
       "judge": "rules",
-      "seconds": 1.5,
+      "after_fix": {
+        "category": "example_snippet",
+        "explanation": "The step references example input files that do not exist - it is an illustrative snippet, not a runnable instruction."
+      },
+      "seconds": 4.4,
       "output": "bash: line 1: qpdf: command not found\nbash: line 2: qpdf: command not found\nbash: line 3: qpdf: command not found\nbash: line 4: qpdf: command not found\nbash: line 5: qpdf: command not found\n\n\n[clinic] fix attempt output:\n\nqpdf: error at * in numeric range *file2.pdf: invalid range syntax\n\nFor help:\n  qpdf --help=usage       usage information\n  qpdf --help=topic       help on a topic\n  qpdf --help=--option    help on an option\n  qpdf --help             general help and a topic list\n\nqpdf: open input.pdf: No such file or directory\nqpdf: open input.pdf: No such file or directory\nqpdf: open input.pdf: No such file or directory\nqpdf: open encrypted.pdf: No such file or directory\n"
     },
     {
@@ -52,7 +60,11 @@
       "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq pdftk-java >/dev/null 2>&1 && pdftk file1.pdf file2.pdf cat output merged.pdf\npdftk input.pdf burst\npdftk input.pdf rotate 1east output rotated.pdf",
       "confidence": 0.85,
       "judge": "rules",
-      "seconds": 10.4,
+      "after_fix": {
+        "category": "example_snippet",
+        "explanation": "The step references example input files that do not exist - it is an illustrative snippet, not a runnable instruction."
+      },
+      "seconds": 9.8,
       "output": "bash: line 1: pdftk: command not found\nbash: line 2: pdftk: command not found\nbash: line 3: pdftk: command not found\n\n\n[clinic] fix attempt output:\nError: Unable to find file.\nError: Failed to open input PDF file: \n   file1.pdf\nError: Unable to find file.\nError: Failed to open input PDF file: \n   file2.pdf\nErrors encountered.  No output created.\nDone.  Input errors, so no output created.\nError: Unable to find file.\nError: Failed to open input PDF file: \n   input.pdf\nDone.  Input errors, so no output created.\nError: Unable to find file.\nError: Failed to open input PDF file: \n   input.pdf\nErrors encountered.  No output created.\nDone.  Input errors, so no output created.\n"
     },
     {
@@ -66,7 +78,11 @@
       "fix_command": "sudo apt-get update -qq >/dev/null 2>&1; sudo apt-get install -y -qq poppler-utils >/dev/null 2>&1 && pdfimages -j input.pdf output_prefix",
       "confidence": 0.85,
       "judge": "rules",
-      "seconds": 4.6,
+      "after_fix": {
+        "category": "example_snippet",
+        "explanation": "The step references example input files that do not exist - it is an illustrative snippet, not a runnable instruction."
+      },
+      "seconds": 1.6,
       "output": "bash: line 1: pdfimages: command not found\n\n\n[clinic] fix attempt output:\nI/O Error: Couldn't open file 'input.pdf': No such file or directory.\n"
     }
   ]
