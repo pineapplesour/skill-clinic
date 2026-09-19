@@ -1,18 +1,18 @@
 # Skill Clinic report - `stale-daytona-quickstart`
 
 - Source: `/home/pineapple/skill-clinic/fixtures/stale-daytona-quickstart/SKILL.md`
-- Generated: 2026-09-19T14:34:18+0900
+- Generated: 2026-09-19T14:36:12+0900
 - **Verdict: ENV_SPECIFIC**
-- Steps: 6 (PASS 4, FIXED 1, FAIL 1, SKIP 0)
+- Steps: 6 (PASS 3, FIXED 2, FAIL 1, SKIP 0)
 
 | # | Step | Command | Status | Category | Sec | Judge |
 |---|------|---------|--------|----------|-----|-------|
-| 1 | 1. Install the Python SDK | `pip install daytona` | PASS | - | 0.9 | - |
-| 2 | 2. Install the Node SDK | `npm install @daytonaio/sdk` | PASS | - | 15.0 | - |
-| 3 | 3. Pin the resolver | `pip install --use-feature=2020-resolver daytona` | FIXED | stale_command | 1.6 | rules |
-| 4 | 4. Create your first sandbox from the CLI | `daytona sandbox create --name demo` | PASS | - | 0.6 | - |
-| 5 | 5. Check your credentials | `python -c "import os; assert os.environ.get('DAYTONA_API_KE…` | FAIL | missing_secret | 0.5 | rules |
-| 6 | 6. Verify the SDK imports | `python -c "from daytona import Daytona; print('daytona sdk …` | PASS | - | 1.9 | - |
+| 1 | 1. Install the Python SDK | `pip install daytona` | PASS | - | 1.0 | - |
+| 2 | 2. Install the Node SDK | `npm install @daytonaio/sdk` | PASS | - | 10.6 | - |
+| 3 | 3. Pin the resolver | `pip install --use-feature=2020-resolver daytona` | FIXED | stale_command | 1.4 | rules |
+| 4 | 4. Add the legacy Node package | `npm install @daytonaio/daytona-sdk` | FIXED | stale_package | 2.3 | rules |
+| 5 | 5. Check your credentials | `python -c "import os; assert os.environ.get('DAYTONA_API_KE…` | FAIL | missing_secret | 0.3 | rules |
+| 6 | 6. Verify the SDK imports | `python -c "from daytona import Daytona; print('daytona sdk …` | PASS | - | 5.1 | - |
 
 ## Evidence
 
@@ -22,7 +22,7 @@
 pip install daytona
 ```
 
-- exit code: `0` / 0.9s
+- exit code: `0` / 1.0s
 
 ### 2. 2. Install the Node SDK - PASS
 
@@ -30,7 +30,7 @@ pip install daytona
 npm install @daytonaio/sdk
 ```
 
-- exit code: `0` / 15.0s
+- exit code: `0` / 10.6s
 
 ### 3. 3. Pin the resolver - FIXED
 
@@ -38,7 +38,7 @@ npm install @daytonaio/sdk
 pip install --use-feature=2020-resolver daytona
 ```
 
-- exit code: `2` / 1.6s
+- exit code: `2` / 1.4s
 - category: **stale_command** (judge: `rules`, confidence 0.8)
 - diagnosis: The CLI no longer accepts this subcommand/flag; the skill was written against an older version.
 - proposed fix: `pip install daytona`
@@ -60,13 +60,32 @@ option --use-feature: invalid choice: '2020-resolver' (choose from 'fast-deps', 
 
 </details>
 
-### 4. 4. Create your first sandbox from the CLI - PASS
+### 4. 4. Add the legacy Node package - FIXED
 
 ```bash
-daytona sandbox create --name demo
+npm install @daytonaio/daytona-sdk
 ```
 
-- exit code: `0` / 0.6s
+- exit code: `1` / 2.3s
+- category: **stale_package** (judge: `rules`, confidence 0.8)
+- diagnosis: The package or version referenced by the skill no longer resolves on the registry.
+- proposed fix: `npm install @daytona/sdk`
+
+<details><summary>output tail</summary>
+
+```
+npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/@daytonaio%2fdaytona-sdk - Not found
+npm error 404
+npm error 404  The requested resource '@daytonaio/daytona-sdk@*' could not be found or you do not have permission to access it.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+npm error A complete log of this run can be found in: /home/daytona/.npm/_logs/2026-09-19T05_35_29_161Z-debug-0.log
+
+```
+
+</details>
 
 ### 5. 5. Check your credentials - FAIL
 
@@ -74,7 +93,7 @@ daytona sandbox create --name demo
 python -c "import os; assert os.environ.get('DAYTONA_API_KEY'), 'Set the DAYTONA_API_KEY environment variable'"
 ```
 
-- exit code: `1` / 0.5s
+- exit code: `1` / 0.3s
 - category: **missing_secret** (judge: `rules`, confidence 0.8)
 - diagnosis: The step needs a credential or environment variable that the skill never tells you to set.
 
@@ -97,4 +116,4 @@ AssertionError: Set the DAYTONA_API_KEY environment variable
 python -c "from daytona import Daytona; print('daytona sdk ready')"
 ```
 
-- exit code: `0` / 1.9s
+- exit code: `0` / 5.1s
