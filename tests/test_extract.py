@@ -108,3 +108,33 @@ def test_rules_classifier_categories_and_fixes():
                                )["category"] == "network_blocked"
     assert classify_with_rules("python app.py",
                                "TypeError: unsupported operand")["category"] == "bug"
+
+
+def test_infra_error_is_excluded_from_the_verdict():
+    """A Daytona SDK/network failure is our problem, not the skill's."""
+    from clinic.report import INFRA_STATUS, count_infra_errors, decide_verdict
+    from clinic.sandbox import StepResult
+
+    def step(index, exit_code, status, category=None):
+        return StepResult(index=index, title="t", command="c", exit_code=exit_code,
+                          output="", seconds=0.1, status=status, category=category)
+
+    passing_plus_infra = [step(1, 0, "PASS"), step(2, 124, INFRA_STATUS)]
+    assert decide_verdict(passing_plus_infra) == "HEALTHY"
+    assert count_infra_errors(passing_plus_infra) == 1
+
+    # ...and it must not turn a real failure into something else either
+    mixed = [step(1, 0, "PASS"), step(2, 124, INFRA_STATUS), step(3, 1, "FAIL", "bug")]
+    assert decide_verdict(mixed) == "BROKEN"
+    assert decide_verdict([step(1, 124, INFRA_STATUS)]) == "HEALTHY"
+
+
+def test_missing_skill_path_gives_a_friendly_error_not_a_traceback(capsys, tmp_path):
+    """`clinic.py /nope` must exit 2 with a readable message."""
+    from clinic.cli import main
+
+    code = main([str(tmp_path / "definitely-not-here"), "--no-llm"])
+    assert code == 2
+    out = capsys.readouterr().out
+    assert "cannot read that skill" in out
+    assert "Traceback" not in out

@@ -1,0 +1,6 @@
+# Pinned to the versions this project was built and demoed with.
+daytona==0.214.0
+openai==3.16.2
+requests==2.34.2
+rich==15.0.0
+pytest==9.1.1
