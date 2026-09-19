@@ -930,7 +930,7 @@ function renderBadge(d){
 /* ---------- navigation ---------- */
 function show(n){
   [0,1,2,3].forEach(i => $("view"+i).classList.toggle("on", i === n));
-  [...$("nav").children].forEach(a => a.classList.toggle("on", +a.dataset.view === (n === 0 ? 0 : 1)));
+  [...$("nav").children].forEach(a => a.classList.toggle("on", n < 2 && +a.dataset.view === n));
   if(n !== 3) $("topRight").textContent = "";
   if(n === 0) renderDash();
   window.scrollTo(0,0);
