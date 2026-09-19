@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Skill Clinic - stale-daytona-quickstart (ENV_SPECIFIC)</title><style>
+:root {
+  --bg: #f6f6f8;
+  --card: #ffffff;
+  --ink: #1b1b1f;
+  --muted: #62626d;
+  --line: #e3e3e8;
+  --accent: #4f46e5;
+  --code-bg: #f3f3f6;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  padding: 32px 16px 64px;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+header.card { border-top: 3px solid var(--accent); }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -0.01em; }
+h1 .name { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; color: var(--accent); }
+h2 { font-size: 15px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 12px; }
+.sub { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+.sub code { background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.verdict {
+  display: inline-block; padding: 6px 14px; border-radius: 999px;
+  font-weight: 700; font-size: 14px; letter-spacing: .04em; border: 1px solid;
+}
+.counts { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; padding: 0; margin: 16px 0 0; }
+.counts li {
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 14px; min-width: 86px;
+}
+.counts .n { display: block; font-size: 20px; font-weight: 700; line-height: 1.2; }
+.counts .k { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); }
+td.num, th.num { text-align: right; width: 42px; color: var(--muted); }
+code, pre, .mono { font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace; }
+td code { font-size: 12.5px; word-break: break-all; }
+.pill {
+  display: inline-block; padding: 2px 9px; border-radius: 999px; border: 1px solid;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .03em;
+}
+.cat { font-size: 12.5px; }
+.cat .arrow { color: var(--accent); font-weight: 700; }
+.muted { color: var(--muted); }
+details { border: 1px solid var(--line); border-radius: 8px; margin-top: 10px; background: var(--card); }
+details[open] { border-color: #c9c6f2; }
+summary {
+  cursor: pointer; padding: 10px 14px; font-size: 13.5px; font-weight: 600;
+  display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+}
+summary::marker { color: var(--accent); }
+.detail-body { padding: 0 14px 14px; }
+.detail-body p { margin: 8px 0; font-size: 13.5px; }
+.label { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); display: block; margin-top: 12px; }
+pre {
+  background: var(--code-bg); border: 1px solid var(--line); border-radius: 6px;
+  padding: 11px 13px; overflow-x: auto; font-size: 12.5px; margin: 6px 0 0;
+  white-space: pre-wrap; word-break: break-word;
+}
+pre.fix { background: #f0efff; border-color: #d4d1f7; }
+footer { color: var(--muted); font-size: 12px; text-align: center; }
+</style></head><body><div class="wrap"><header class="card"><h1>Skill Clinic &mdash; <span class="name">stale-daytona-quickstart</span></h1><p class="sub">Source: <code>/home/pineapple/skill-clinic/fixtures/stale-daytona-quickstart/SKILL.md</code> &middot; Generated: 2026-09-19T14:40:09+0900 &middot; Fix mode: on &middot; Judge: rules (deterministic) &middot; Backends used: rules x3</p><span class="verdict" style="color:#7a4a06;background:#fdeccd;border-color:#f2d49a">VERDICT: ENV_SPECIFIC</span><ul class="counts"><li><span class="n">3</span><span class="k">PASS</span></li><li><span class="n">2</span><span class="k">FIXED</span></li><li><span class="n">1</span><span class="k">FAIL</span></li><li><span class="n">6</span><span class="k">steps</span></li></ul></header><section class="card"><h2>Steps</h2><table><thead><tr><th class="num">#</th><th>Step</th><th>Command</th><th>Status</th><th>Category</th><th class="num">Sec</th><th>Judge</th></tr></thead><tbody><tr><td class="num">1</td><td>1. Install the Python SDK</td><td><code>pip install daytona</code></td><td><span class="pill" style="color:#0f5132;background:#d7f3e3;border-color:#a9e0c4">PASS</span></td><td><span class="muted">-</span></td><td class="num">0.9</td><td class="muted">-</td></tr><tr><td class="num">2</td><td>2. Install the Node SDK</td><td><code>npm install @daytonaio/sdk</code></td><td><span class="pill" style="color:#0f5132;background:#d7f3e3;border-color:#a9e0c4">PASS</span></td><td><span class="muted">-</span></td><td class="num">14.6</td><td class="muted">-</td></tr><tr><td class="num">3</td><td>3. Pin the resolver</td><td><code>pip install --use-feature=2020-resolver daytona</code></td><td><span class="pill" style="color:#1c3f94;background:#dce6ff;border-color:#b6c8f7">FIXED</span></td><td><span class="cat">stale_command</span></td><td class="num">1.4</td><td class="muted">rules</td></tr><tr><td class="num">4</td><td>4. Add the legacy Node package</td><td><code>npm install @daytonaio/daytona-sdk</code></td><td><span class="pill" style="color:#1c3f94;background:#dce6ff;border-color:#b6c8f7">FIXED</span></td><td><span class="cat">stale_package</span></td><td class="num">1.9</td><td class="muted">rules</td></tr><tr><td class="num">5</td><td>5. Check your credentials</td><td><code>python -c &quot;import os; assert os.environ.get(&#x27;DAYTONA_API_KEY&#x27;), &#x27;Set the DAYTONA_API_KEY environment variable&#x27;&quot;</code></td><td><span class="pill" style="color:#8a1c24;background:#fbdcde;border-color:#f3b7bc">FAIL</span></td><td><span class="cat">missing_secret</span></td><td class="num">0.3</td><td class="muted">rules</td></tr><tr><td class="num">6</td><td>6. Verify the SDK imports</td><td><code>python -c &quot;from daytona import Daytona; print(&#x27;daytona sdk ready&#x27;)&quot;</code></td><td><span class="pill" style="color:#0f5132;background:#d7f3e3;border-color:#a9e0c4">PASS</span></td><td><span class="muted">-</span></td><td class="num">4.5</td><td class="muted">-</td></tr></tbody></table></section><section class="card"><h2>Evidence</h2><details><summary><span class="pill" style="color:#0f5132;background:#d7f3e3;border-color:#a9e0c4">PASS</span> <span>1. 1. Install the Python SDK</span> <span class="muted">-</span></summary><div class="detail-body"><span class="label">command</span><pre>pip install daytona</pre><p class="muted">exit code <code>0</code> &middot; 0.9s</p><p class="muted">No fix proposed.</p><span class="label">output tail</span><pre>nnotated-types&gt;=0.6.0 in /usr/local/lib/python3.14/site-packages (from pydantic&lt;3.0.0,&gt;=2.4.2-&gt;daytona) (0.7.0)
+Requirement already satisfied: pydantic-core==2.46.4 in /usr/local/lib/python3.14/site-packages (from pydantic&lt;3.0.0,&gt;=2.4.2-&gt;daytona) (2.46.4)
+Requirement already satisfied: typing-inspection&gt;=0.4.2 in /usr/local/lib/python3.14/site-packages (from pydantic&lt;3.0.0,&gt;=2.4.2-&gt;daytona) (0.4.2)
+Requirement already satisfied: aiohappyeyeballs&gt;=2.5.0 in /usr/local/lib/python3.14/site-packages (from aiohttp&gt;=3.8.4-&gt;daytona-api-client-async==0.134.0-&gt;daytona) (2.6.1)
+Requirement already satisfied: aiosignal&gt;=1.4.0 in /usr/local/lib/python3.14/site-packages (from aiohttp&gt;=3.8.4-&gt;daytona-api-client-async==0.134.0-&gt;daytona) (1.4.0)
+Requirement already satisfied: attrs&gt;=17.3.0 in /usr/local/lib/python3.14/site-packages (from aiohttp&gt;=3.8.4-&gt;daytona-api-client-async==0.134.0-&gt;daytona) (26.1.0)
+Requirement already satisfied: frozenlist&gt;=1.1.1 in /usr/local/lib/python3.14/site-packages (from aiohttp&gt;=3.8.4-&gt;daytona-api-client-async==0.134.0-&gt;daytona) (1.8.0)
+Requirement already satisfied: multidict&lt;7.0,&gt;=4.5 in /usr/local/lib/python3.14/site-packages (from aiohttp&gt;=3.8.4-&gt;daytona-api-client-async==0.134.0-&gt;daytona) (6.7.1)
+Requirement already satisfied: propcache&gt;=0.2.0 in /usr/local/lib/python3.14/site-packages (from aiohttp&gt;=3.8.4-&gt;daytona-api-client-async==0.134.0-&gt;daytona) (0.5.2)
+Requirement already satisfied: yarl&lt;2.0,&gt;=1.17.0 in /usr/local/lib/python3.14/site-packages (from aiohttp&gt;=3.8.4-&gt;daytona-api-client-async==0.134.0-&gt;daytona) (1.23.0)
+Requirement already satisfied: packaging&gt;=17.0 in /usr/local/lib/python3.14/site-packages (from marshmallow&gt;=3.26.2-&gt;environs&lt;15.0.0,&gt;=10.0.0-&gt;daytona) (25.0)
+Requirement already satisfied: six&gt;=1.5 in /usr/local/lib/python3.14/site-packages (from python-dateutil&gt;=2.8.2-&gt;daytona-api-client==0.134.0-&gt;daytona) (1.17.0)
+
+[notice] A new release of pip is available: 26.0.1 -&gt; 26.2.1
+[notice] To update, run: pip install --upgrade pip
+</pre></div></details><details><summary><span class="pill" style="color:#0f5132;background:#d7f3e3;border-color:#a9e0c4">PASS</span> <span>2. 2. Install the Node SDK</span> <span class="muted">-</span></summary><div class="detail-body"><span class="label">command</span><pre>npm install @daytonaio/sdk</pre><p class="muted">exit code <code>0</code> &middot; 14.6s</p><p class="muted">No fix proposed.</p><span class="label">output tail</span><pre>npm warn deprecated @daytonaio/sdk@0.214.0: Moved to @daytona/sdk, same API, no breaking changes. Please update: npm uninstall @daytonaio/sdk &amp;&amp; npm i @daytona/sdk
+
+added 179 packages in 16s
+
+17 packages are looking for funding
+  run `npm fund` for details
+npm notice
+npm notice New minor version of npm available! 11.12.1 -&gt; 11.19.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.19.1
+npm notice To update run: npm install -g npm@11.19.1
+npm notice
+</pre></div></details><details><summary><span class="pill" style="color:#1c3f94;background:#dce6ff;border-color:#b6c8f7">FIXED</span> <span>3. 3. Pin the resolver</span> <span class="cat">stale_command</span></summary><div class="detail-body"><span class="label">command</span><pre>pip install --use-feature=2020-resolver daytona</pre><p class="muted">exit code <code>2</code> &middot; 1.4s &middot; confidence 0.8</p><p><strong>Diagnosis:</strong> The CLI no longer accepts this subcommand/flag; the skill was written against an older version.</p><span class="label">proposed fix</span><pre class="fix">pip install daytona</pre><span class="label">output tail</span><pre>
+[optparse.groups]Usage:[/]   
+  pip install \[options] &lt;requirement specifier&gt; \[package-index-options] ...
+  pip install \[options] -r &lt;requirements file&gt; \[package-index-options] ...
+  pip install \[options] [-e] &lt;vcs project url&gt; ...
+  pip install \[options] [-e] &lt;local project path&gt; ...
+  pip install \[options] &lt;archive url/path&gt; ...
+
+option --use-feature: invalid choice: &#x27;2020-resolver&#x27; (choose from &#x27;fast-deps&#x27;, &#x27;build-constraint&#x27;, &#x27;inprocess-build-deps&#x27;, &#x27;truststore&#x27;, &#x27;no-binary-enable-wheel-cache&#x27;)
+</pre></div></details><details><summary><span class="pill" style="color:#1c3f94;background:#dce6ff;border-color:#b6c8f7">FIXED</span> <span>4. 4. Add the legacy Node package</span> <span class="cat">stale_package</span></summary><div class="detail-body"><span class="label">command</span><pre>npm install @daytonaio/daytona-sdk</pre><p class="muted">exit code <code>1</code> &middot; 1.9s &middot; confidence 0.8</p><p><strong>Diagnosis:</strong> The package or version referenced by the skill no longer resolves on the registry.</p><span class="label">proposed fix</span><pre class="fix">npm install @daytona/sdk</pre><span class="label">output tail</span><pre>npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/@daytonaio%2fdaytona-sdk - Not found
+npm error 404
+npm error 404  The requested resource &#x27;@daytonaio/daytona-sdk@*&#x27; could not be found or you do not have permission to access it.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+npm error A complete log of this run can be found in: /home/daytona/.npm/_logs/2026-09-19T05_39_26_119Z-debug-0.log
+</pre></div></details><details><summary><span class="pill" style="color:#8a1c24;background:#fbdcde;border-color:#f3b7bc">FAIL</span> <span>5. 5. Check your credentials</span> <span class="cat">missing_secret</span></summary><div class="detail-body"><span class="label">command</span><pre>python -c &quot;import os; assert os.environ.get(&#x27;DAYTONA_API_KEY&#x27;), &#x27;Set the DAYTONA_API_KEY environment variable&#x27;&quot;</pre><p class="muted">exit code <code>1</code> &middot; 0.3s &middot; confidence 0.8</p><p><strong>Diagnosis:</strong> The step needs a credential or environment variable that the skill never tells you to set.</p><p class="muted">No fix proposed.</p><span class="label">output tail</span><pre>Traceback (most recent call last):
+  File &quot;&lt;string&gt;&quot;, line 1, in &lt;module&gt;
+    import os; assert os.environ.get(&#x27;DAYTONA_API_KEY&#x27;), &#x27;Set the DAYTONA_API_KEY environment variable&#x27;
+                      ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+AssertionError: Set the DAYTONA_API_KEY environment variable
+</pre></div></details><details><summary><span class="pill" style="color:#0f5132;background:#d7f3e3;border-color:#a9e0c4">PASS</span> <span>6. 6. Verify the SDK imports</span> <span class="muted">-</span></summary><div class="detail-body"><span class="label">command</span><pre>python -c &quot;from daytona import Daytona; print(&#x27;daytona sdk ready&#x27;)&quot;</pre><p class="muted">exit code <code>0</code> &middot; 4.5s</p><p class="muted">No fix proposed.</p><span class="label">output tail</span><pre>daytona sdk ready
+</pre></div></details></section><footer>Generated by Skill Clinic &middot; every status comes from a real exit code in a fresh sandbox.</footer></div></body></html>
