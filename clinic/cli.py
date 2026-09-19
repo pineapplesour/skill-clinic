@@ -16,6 +16,7 @@ from .extract import load_skill
 from .html_report import write_html
 from .judge import classify, classify_with_rules
 from .report import INFRA_STATUS, count_infra_errors, decide_verdict, render_table, write_reports
+from .security import analyse, headline, summarize
 from .sandbox import ClinicConfigError, SandboxInfraError, run_steps, verify_fix
 
 console = Console(width=max(shutil.get_terminal_size((120, 24)).columns, 118))
@@ -81,6 +82,28 @@ def main(argv: list[str] | None = None) -> int:
     except ClinicConfigError as err:
         console.print(f"[red]configuration error:[/] {err}")
         return 2
+
+    # Behaviour observation: what did each step actually TRY to do? The command text
+    # gives the intent, the sandbox output gives the evidence (egress blocked, no
+    # secrets present). This never touches the verdict - it is reported separately.
+    for r in results:
+        r.security = analyse(r.command, r.output)
+    flagged = [r for r in results if r.security]
+    if flagged:
+        console.print("\n[bold]Security observations[/] - what the skill tried to do "
+                      "(executed in a throwaway sandbox with egress blocked)")
+        for r in flagged:
+            blocked = any(f["rule"] == "egress_blocked" for f in r.security)
+            missing = any(f["rule"] == "no_secret_present" for f in r.security)
+            note = ("  (egress blocked by sandbox)" if blocked
+                    else "  (no secret present in sandbox)" if missing else "")
+            for f in r.security:
+                if f["severity"] == "info":
+                    continue
+                colour = {"high": "red", "medium": "yellow"}.get(f["severity"], "dim")
+                console.print(f"   [{colour}]SECURITY [{f['severity']}][/] "
+                              f"{f['rule']}: {f['evidence']}{note}",
+                              highlight=False)
 
     # INFRA_ERROR steps are our failure, not the skill's: never judged, never counted.
     failures = [r for r in results if not r.ok and r.status != INFRA_STATUS]
@@ -148,10 +171,17 @@ def main(argv: list[str] | None = None) -> int:
     render_table(console, skill["name"], results)
     style = {"HEALTHY": "bold green", "FIXABLE": "bold cyan",
              "ENV_SPECIFIC": "bold yellow"}.get(verdict, "bold red")
+    sec_line, sec_style = headline(results)
     console.print(f"VERDICT: [{style}]{verdict}[/]  "
                   f"({sum(1 for r in results if r.status == 'PASS')} pass / "
                   f"{fixes_verified} fixed / "
-                  f"{sum(1 for r in results if r.status == 'FAIL')} fail)")
+                  f"{sum(1 for r in results if r.status == 'FAIL')} fail)"
+                  f"   [{sec_style}]{sec_line}[/]")
+    sec = summarize(results)
+    console.print(f"security: {sec['high']} high, {sec['medium']} medium"
+                  f"{f", {sec['low']} low" if sec['low'] else ''}"
+                  "  (observation only - the verdict is unchanged)",
+                  style="dim")
     infra = count_infra_errors(results)
     if infra:
         console.print(f"infrastructure errors: {infra}  "
@@ -161,7 +191,7 @@ def main(argv: list[str] | None = None) -> int:
 
     paths = write_reports(
         skill["name"], skill["file"], results, verdict, out_dir=args.out,
-        meta={"fix_mode": args.fix, "llm_judge": use_llm,
+        meta={"fix_mode": args.fix, "llm_judge": use_llm, "security": sec,
               "llm_model": os.environ.get("LLM_MODEL") if use_llm else None})
     html_path = Path(paths["json"]).with_suffix(".html")
     write_html(json.loads(Path(paths["json"]).read_text(encoding="utf-8")), html_path)

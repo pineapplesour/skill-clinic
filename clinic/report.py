@@ -92,6 +92,31 @@ def render_table(console: Console, skill_name: str, results) -> None:
     console.print(table)
 
 
+def _security_section(results) -> list[str]:
+    """Markdown 'Security observations' - what each flagged step actually tried to do."""
+    flagged = [r for r in results if getattr(r, "security", None)]
+    if not flagged:
+        return ["", "## Security observations", "",
+                "No injected or suspicious behaviour was observed in any step."]
+    lines = ["", "## Security observations", "",
+             "Every step below was **executed** in a throwaway Daytona sandbox with "
+             "arbitrary egress blocked, so this is what the skill *tried* to do, not a "
+             "static guess. Findings are observations only - they do not change the verdict.",
+             "",
+             "| # | Step | Severity | Rule | Evidence |",
+             "|---|------|----------|------|----------|"]
+    for r in flagged:
+        for f in r.security:
+            evidence = f["evidence"].replace("|", "\\|")
+            lines.append(f"| {r.index} | {r.title} | {f['severity']} | {f['rule']} | "
+                         f"`{evidence}` |")
+    lines.append("")
+    for r in flagged:
+        lines.append(f"- **step {r.index} ({r.title})**: "
+                     + "; ".join(f"{f['rule']} - {f['note']}" for f in r.security))
+    return lines
+
+
 def write_reports(skill_name: str, skill_file: str, results, verdict: str,
                   out_dir: str = "reports", meta: dict | None = None) -> dict:
     os.makedirs(out_dir, exist_ok=True)
@@ -132,6 +157,7 @@ def write_reports(skill_name: str, skill_file: str, results, verdict: str,
             f"| {r.index} | {r.title} | `{cmd}` | {r.status} | "
             f"{category_cell(r, '→')} | {r.seconds:.1f} | {r.judge or '-'} |"
         )
+    lines += _security_section(results)
     lines.append("")
     lines.append("## Evidence")
     for r in results:
