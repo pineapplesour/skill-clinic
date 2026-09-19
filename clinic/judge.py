@@ -188,11 +188,17 @@ def classify_with_llm(command: str, output: str, exit_code: int = 1) -> dict:
     }
 
 
-def classify(command: str, output: str, exit_code: int = 1, use_llm: bool = True) -> dict:
-    """Classify a failure; LLM when configured, deterministic rules otherwise."""
+def classify(command: str, output: str, exit_code: int = 1, use_llm: bool = True,
+             on_fallback=None) -> dict:
+    """Classify a failure; LLM when configured, deterministic rules otherwise.
+
+    A failed LLM call is never swallowed silently: ``on_fallback(err)`` is invoked so
+    the caller can say out loud which backend actually judged the step.
+    """
     if use_llm:
         try:
             return classify_with_llm(command, output, exit_code)
-        except Exception:
-            pass
+        except Exception as err:
+            if on_fallback is not None:
+                on_fallback(err)
     return classify_with_rules(command, output, exit_code)

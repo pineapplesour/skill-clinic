@@ -9,10 +9,12 @@ import sys
 
 from rich.console import Console
 
+from collections import Counter
+
 from .extract import load_skill
 from .judge import classify
-from .report import decide_verdict, render_table, write_reports
-from .sandbox import run_steps, verify_fix
+from .report import INFRA_STATUS, count_infra_errors, decide_verdict, render_table, write_reports
+from .sandbox import ClinicConfigError, run_steps, verify_fix
 
 console = Console(width=max(shutil.get_terminal_size((120, 24)).columns, 118))
 
@@ -21,11 +23,21 @@ def _log(msg: str) -> None:
     console.print(msg, style="dim", highlight=False)
 
 
+def _judge_summary(results) -> str:
+    """Report the judge backend that was ACTUALLY used, counted from the rows."""
+    used = Counter(r.judge for r in results if r.judge)
+    if not used:
+        return "none (no step needed diagnosing)"
+    return ", ".join(f"{name} ×{n}" for name, n in used.most_common())
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="clinic",
         description="Run an agent skill's instructions in a fresh Daytona sandbox "
-                    "and report what actually works.")
+                    "and report what actually works.",
+        epilog="exit codes: 0 = HEALTHY or FIXABLE, 1 = ENV_SPECIFIC or BROKEN "
+               "(a real finding, not a crash), 2 = usage/configuration error.")
     p.add_argument("skill", help="path to a skill directory or a SKILL.md/README.md")
     p.add_argument("--fix", action="store_true",
                    help="re-verify proposed fixes in a fresh sandbox")
@@ -41,7 +53,16 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     use_llm = not args.no_llm and bool(os.environ.get("LLM_BASE_URL"))
 
-    skill = load_skill(args.skill, max_steps=args.max_steps)
+    try:
+        skill = load_skill(args.skill, max_steps=args.max_steps)
+    except FileNotFoundError as err:
+        console.print(f"[red]cannot read that skill:[/] {err}")
+        console.print("  Pass a directory containing SKILL.md/README.md, or the .md file itself, "
+                      "e.g. [bold]fixtures/healthy-csv-summary[/]")
+        return 2
+    except OSError as err:
+        console.print(f"[red]cannot read that skill:[/] {err}")
+        return 2
     console.rule(f"[bold]Skill Clinic[/] - {skill['name']}")
     console.print(f"source     : {skill['file']}")
     console.print(f"steps found: {len(skill['steps'])}"
@@ -52,14 +73,22 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     console.print("\n[bold]Phase 1[/] - running the skill in a fresh sandbox")
-    results = run_steps(skill["dir"], skill["steps"], timeout=args.timeout,
-                        log=_log, label="A")
+    try:
+        results = run_steps(skill["dir"], skill["steps"], timeout=args.timeout,
+                            log=_log, label="A")
+    except ClinicConfigError as err:
+        console.print(f"[red]configuration error:[/] {err}")
+        return 2
 
-    failures = [r for r in results if not r.ok]
+    # INFRA_ERROR steps are our failure, not the skill's: never judged, never counted.
+    failures = [r for r in results if not r.ok and r.status != INFRA_STATUS]
     if failures:
         console.print(f"\n[bold]Phase 2[/] - diagnosing {len(failures)} failure(s)")
     for r in failures:
-        verdict = classify(r.command, r.output, r.exit_code, use_llm=use_llm)
+        verdict = classify(r.command, r.output, r.exit_code, use_llm=use_llm,
+                           on_fallback=lambda err: console.print(
+                               f"   llm judge unavailable ({type(err).__name__}) -> rules",
+                               style="yellow", highlight=False))
         r.category = verdict["category"]
         r.explanation = verdict["explanation"]
         r.fix_command = verdict["fix_command"]
@@ -77,8 +106,12 @@ def main(argv: list[str] | None = None) -> int:
             prior = [x.command for x in results if x.index < r.index and x.ok]
             console.print(f"  [step {r.index}] replaying {len(prior)} passing step(s) + fix",
                           style="dim")
-            code, out, secs = verify_fix(skill["dir"], prior, r.fix_command,
-                                         timeout=args.timeout, log=_log)
+            try:
+                code, out, secs = verify_fix(skill["dir"], prior, r.fix_command,
+                                             timeout=args.timeout, log=_log)
+            except ClinicConfigError as err:
+                console.print(f"[red]configuration error:[/] {err}")
+                return 2
             r.seconds += secs
             if code == 0:
                 r.status = "FIXED"
@@ -97,6 +130,12 @@ def main(argv: list[str] | None = None) -> int:
                   f"({sum(1 for r in results if r.status == 'PASS')} pass / "
                   f"{fixes_verified} fixed / "
                   f"{sum(1 for r in results if r.status == 'FAIL')} fail)")
+    infra = count_infra_errors(results)
+    if infra:
+        console.print(f"infrastructure errors: {infra}  "
+                      "(sandbox/SDK failures - excluded from the verdict, never judged)",
+                      style="magenta")
+    console.print(f"judge backends used: {_judge_summary(results)}")
 
     paths = write_reports(
         skill["name"], skill["file"], results, verdict, out_dir=args.out,
