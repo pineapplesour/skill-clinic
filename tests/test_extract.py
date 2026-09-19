@@ -110,6 +110,19 @@ def test_rules_classifier_categories_and_fixes():
                                "TypeError: unsupported operand")["category"] == "bug"
 
 
+def test_windows_path_and_missing_input_messages():
+    """A bare `C:\\...` path is host-specific; pdftk's wording is an example snippet."""
+    win = classify_with_rules(r"dir C:\Users\me", "The system cannot find the path specified.")
+    assert win["category"] == "env_specific"
+    assert win["fix_command"] is None
+
+    # pdftk says "Unable to find file" instead of the usual "No such file or directory".
+    snippet = classify_with_rules("pdftk input.pdf dump_data",
+                                  "Error: Unable to find file.\nErrors encountered.")
+    assert snippet["category"] == "example_snippet"
+    assert snippet["fix_command"] is None
+
+
 def test_infra_error_is_excluded_from_the_verdict():
     """A Daytona SDK/network failure is our problem, not the skill's."""
     from clinic.report import INFRA_STATUS, count_infra_errors, decide_verdict

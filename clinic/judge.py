@@ -40,7 +40,7 @@ _RULES: list[tuple[str, str]] = [
 ]
 
 _ENV_CMD = (
-    r"powershell(?:\.exe)?|\bcmd\.exe|/mnt/[a-z]/|[A-Za-z]:\\\\|\bwsl\b|\bbrew\b|"
+    r"powershell(?:\.exe)?|\bcmd\.exe|/mnt/[a-z]/|[A-Za-z]:\\|\bwsl\b|\bbrew\b|"
     r"\bsudo\b|\bsystemctl\b|\bosascript\b|\.exe\b"
 )
 
@@ -52,7 +52,7 @@ TOOL_PACKAGES = {
     "soffice": "libreoffice", "gs": "ghostscript", "zip": "zip", "unzip": "unzip", "tree": "tree",
 }
 _CMD_NOT_FOUND = re.compile(r"(?:bash: line \d+: |bash: |sh: \d+: |/bin/sh: \d+: )?([A-Za-z0-9_.+-]+): (?:command )?not found")
-_MISSING_INPUT = re.compile(r"No such file or directory|Couldn't open file|cannot open|can't open|does not exist|not found: .*\.(?:pdf|docx|csv|json|txt)", re.IGNORECASE)
+_MISSING_INPUT = re.compile(r"No such file or directory|No such file|Couldn't open file|Unable to find file|Failed to open input|cannot open|can't open|does not exist|not found: .*\.(?:pdf|docx|csv|json|txt)", re.IGNORECASE)
 
 _EXPLANATIONS = {
     "missing_tool": "The step calls a binary that a fresh machine does not have; the skill never says to install it.",
@@ -161,6 +161,8 @@ for real inside a clean Linux sandbox. Classify ONE failed step.
 Allowed categories (choose exactly one):
 - stale_package: package/version no longer exists or was renamed/deprecated
 - stale_command: CLI subcommand or flag no longer exists (tool changed its interface)
+- missing_tool: calls a binary a fresh machine does not have and the skill never says to install
+- example_snippet: references example input files that do not exist - illustration, not instruction
 - missing_secret: needs a credential/env var the skill never mentions
 - env_specific: assumes a specific OS, shell, sudo or local path
 - network_blocked: needs network the sandbox does not allow

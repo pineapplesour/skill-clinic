@@ -18,7 +18,6 @@ _PILL = {
     "FIXED": ("#1c3f94", "#dce6ff", "#b6c8f7"),
     "FAIL": ("#8a1c24", "#fbdcde", "#f3b7bc"),
     "INFRA_ERROR": ("#4a4a55", "#e6e6ea", "#d0d0d8"),
-    "SKIP": ("#4a4a55", "#e6e6ea", "#d0d0d8"),
 }
 
 #: The overall verdict banner. ENV_SPECIFIC is amber: a real finding, but about the host.
@@ -146,7 +145,7 @@ def _header(report: dict) -> str:
     steps = report.get("steps") or []
 
     tiles = []
-    for key in ("PASS", "FIXED", "FAIL", "INFRA_ERROR", "SKIP"):
+    for key in ("PASS", "FIXED", "FAIL", "INFRA_ERROR"):
         if key in counts and (counts[key] or key in ("PASS", "FIXED", "FAIL")):
             tiles.append(f'<li><span class="n">{_esc(counts[key])}</span>'
                          f'<span class="k">{_esc(key.replace("_", " "))}</span></li>')

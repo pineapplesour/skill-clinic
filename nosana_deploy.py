@@ -5,7 +5,7 @@ Flow (all real Nosana API calls, credit-based, no wallet needed):
   1. take an official Nosana template job definition (Ollama server + model),
   2. pin it to IPFS (Nosana's community Pinata key, intentionally public in nosana-kit),
   3. POST /jobs/list  -> job address + run account, paid with account credits,
-  4. poll until https://<job>.node.k8s.prd.nos.ci/api/tags answers 200,
+  4. poll until /api/tags (Ollama) or /v1/models (vLLM) answers 200,
   5. print the OpenAI-compatible base URL to export as LLM_BASE_URL.
 
 Usage:
@@ -141,11 +141,25 @@ def job_status(job: str) -> dict:
     return _get_json(f"{API}/jobs/{job}", f"GET /jobs/{job}")
 
 
+#: Health paths of the two server kinds we deploy: Ollama and vLLM (OpenAI-compatible).
+READY_PATHS = ("/api/tags", "/v1/models")
+
+
+def ready_path(job: str) -> str | None:
+    """The first health path that answers 200, or None if neither does."""
+    base = NODE_URL.format(job=job)
+    for path in READY_PATHS:
+        try:
+            if requests.get(base + path, timeout=8).status_code == 200:
+                return path
+        except requests.RequestException:
+            continue
+    return None
+
+
 def endpoint_ready(job: str) -> bool:
-    try:
-        return requests.get(NODE_URL.format(job=job) + "/api/tags", timeout=8).status_code == 200
-    except requests.RequestException:
-        return False
+    """True when either the Ollama (/api/tags) or the vLLM (/v1/models) API answers 200."""
+    return ready_path(job) is not None
 
 
 def wait_ready(job: str, max_minutes: int = 20) -> bool:
@@ -153,7 +167,10 @@ def wait_ready(job: str, max_minutes: int = 20) -> bool:
     while time.time() - t0 < max_minutes * 60:
         st = job_status(job)
         print(f"  [{int(time.time()-t0):4d}s] state={st.get('state')} node={str(st.get('node',''))[:8]}", flush=True)
-        if endpoint_ready(job):
+        path = ready_path(job)
+        if path:
+            kind = "ollama" if path == "/api/tags" else "vllm"
+            print(f"  endpoint answered 200 on {path} ({kind})", flush=True)
             return True
         time.sleep(10)
     return False
